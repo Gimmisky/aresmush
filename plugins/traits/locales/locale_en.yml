@@ -1,0 +1,6 @@
+en:
+    traits:
+        trait_set: "Trait set."
+        traits_title: "Traits - %{name}"
+        trait_removed: "Trait removed."
+    
