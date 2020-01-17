@@ -2,17 +2,14 @@ module AresMUSH
   module Login
 
     def self.terms_of_service
-      use_tos = Global.read_config("login", "use_terms_of_service") 
-      return nil if !use_tos
-      
       begin
         tos_filename = "game/text/tos.txt"
         tos_text = File.read(tos_filename, :encoding => "UTF-8")
       rescue Exception => ex
         Global.logger.warn "Can't read terms of service file: #{ex}"
-        tos_text = t('login.cant_read_tos_text')
+        tos_text = ""
       end
-      return tos_text
+      return tos_text.blank? ? nil : tos_text
     end
     
     # Checks to see if either the IP or hostname is a match with the specified string.
@@ -32,6 +29,14 @@ module AresMUSH
     
     def self.is_online?(char)
       !!Login.find_client(char)
+    end
+    
+    def self.is_online_or_on_web?(char)
+      Login.find_client(char) || Login.find_web_client(char)
+    end
+    
+    def self.is_portal_only?(char)
+      !Login.find_client(char) && Login.find_web_client(char)
     end
     
     def self.find_client(char)
@@ -59,6 +64,8 @@ module AresMUSH
     end
       
     def self.login_char(char, client)
+      char.update(login_failures: 0)
+
       # Handle reconnect
       existing_client = Login.find_client(char)
       client.char_id = char.id
@@ -77,7 +84,38 @@ module AresMUSH
       charset = [('a'..'z'), ('A'..'Z'), ('0'..'9')].map(&:to_a).flatten
       password = (0...10).map{ charset.to_a[rand(charset.size)] }.join
       char.change_password(password)
+      char.update(login_api_token: '')
+      char.update(login_api_token_expiry: Time.now - 86400*5)
       password
+    end
+    
+    def self.notify(char, type, message, reference_id, data = "", notify_if_online = true)
+      unless notify_if_online
+        status = Website.activity_status(char)
+        return if status == 'game-active' || status == 'web-active'
+      end
+      
+      # Check for duplicate notification
+      key = "#{type}|#{message}|#{reference_id}"
+      return if char.login_notices.find(is_unread: true).any? { |n| "#{n.type}|#{n.message}|#{n.reference_id}" == key }
+      LoginNotice.create(character: char, type: type, message: message, data: data, reference_id: reference_id, is_unread: true)
+      Global.client_monitor.notify_web_clients(:notification_update, "#{char.unread_notifications.count}") do |c|
+        c == char 
+      end
+    end
+    
+    def self.mark_notices_read(char, type, reference_id = nil)
+      return if !char
+      
+      if (reference_id)
+        notices = char.login_notices.find(is_unread: true).select { |n| n.type == "#{type}" && n.reference_id == "#{reference_id}"}
+      else
+        notices = char.login_notices.find(is_unread: true).select { |n| n.type == "#{type}" }
+      end
+      
+      notices.each do |n|
+        n.update(is_unread: false)
+      end
     end
   end
 end

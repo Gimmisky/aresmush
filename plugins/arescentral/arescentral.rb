@@ -12,6 +12,10 @@ module AresMUSH
       Global.read_config("arescentral", "shortcuts")
     end
  
+    def self.achievements
+      Global.read_config("arescentral", "achievements")
+    end
+    
     def self.get_cmd_handler(client, cmd, enactor)      
       case cmd.root
       when "game"
@@ -46,6 +50,8 @@ module AresMUSH
         return GetPlayersRequestHandler
       when "player"
         return GetPlayerRequestHandler
+      when "linkHandle"
+        return HandleLinkRequestHandler
       end
       nil
     end

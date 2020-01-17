@@ -8,6 +8,7 @@ module AresMUSH
     attribute :starts, :type => DataType::Time
     attribute :reminded, :type => DataType::Boolean
     attribute :ical_uid
+    attribute :content_warning
     
     reference :character, "AresMUSH::Character"
     collection :signups, "AresMUSH::EventSignup"
@@ -43,6 +44,12 @@ module AresMUSH
     def is_upcoming?(days)
       days_away = time_until_event / 86400.0
       days_away > 0 && days_away < days
+    end
+    
+    def is_signed_up?(char)
+      return nil if !char
+      return true if self.character == char
+      return self.signups.any? { |e| e.character == char }
     end
     
     def is_past?

@@ -14,7 +14,7 @@ module AresMUSH
       end
             
       def handle
-        place = Places.find_place(enactor, self.name)
+        place = Places.find_place(enactor_room, self.name)
       
         if (place)
           client.emit_failure t('places.place_already_exists')
@@ -22,8 +22,7 @@ module AresMUSH
         end
           
         place = Place.create(name: self.name, room: enactor_room)
-        enactor.update(place: place)
-        enactor_room.emit_ooc t('places.place_created', :name => enactor.name, :place_name => self.name)
+        Places.join_place(enactor, place)
       end
     end
   end

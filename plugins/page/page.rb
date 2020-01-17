@@ -46,6 +46,8 @@ module AresMUSH
       case event_name
       when "CronEvent"
         return CronEventHandler
+      when "CharIdledOutEvent"
+        return CharIdledOutEventHandler
       end
       
       nil
@@ -57,6 +59,8 @@ module AresMUSH
         return SendPageRequestHandler
       when "markPageThreadRead"
         return MarkThreadReadRequestHandler
+      when "reportPage"
+        return ReportPageRequestHandler
       end
     end
     

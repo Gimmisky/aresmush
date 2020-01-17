@@ -26,7 +26,7 @@ module AresMUSH
       
       def build_profile(char, field_config)
         demographics = {}
-        Demographics.basic_demographics.sort.each { |d| 
+        Demographics.visible_demographics(char, nil).each { |d| 
             demographics[d.downcase] = char.demographic(d)
           }
         
@@ -36,7 +36,6 @@ module AresMUSH
           
         demographics['age'] = char.age
         demographics['birthdate'] = char.demographic(:birthdate)
-        demographics['actor'] = char.demographic(:actor)
         
         groups = {}
         
@@ -56,8 +55,7 @@ module AresMUSH
           {
             name: char.name,
             id: char.id,
-            fullname: char.demographic(:fullname),
-            military_name: Ranks.military_name(char),
+            military_name: Ranks.is_enabled? ? Ranks.military_name(char) : char.fullname,
             fields: fields,
             icon: Website.icon_for_char(char),
             roster_notes: Website.format_markdown_for_html(char.roster_notes || ""),

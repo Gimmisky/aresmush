@@ -17,12 +17,15 @@ module AresMUSH
     attribute :location
     attribute :summary
     attribute :shared
+    attribute :was_restarted, :type => DataType::Boolean, :default => false
     attribute :logging_enabled, :type => DataType::Boolean, :default => true
     attribute :deletion_warned, :type => DataType::Boolean, :default => false
     attribute :icdate
     attribute :tags, :type => DataType::Array, :default => []
+    attribute :content_warning
     
     collection :scene_poses, "AresMUSH::ScenePose"
+    collection :scene_likes, "AresMUSH::SceneLike"
     reference :scene_log, "AresMUSH::SceneLog"
     reference :plot, "AresMUSH::Plot"
     
@@ -33,8 +36,11 @@ module AresMUSH
     
     before_delete :delete_poses_and_log
     
+    index :shared
+    index :completed
+    
     def self.shared_scenes
-      Scene.all.select { |s| s.shared }
+      Scene.find(shared: true).to_a
     end
     
     def self.scenes_starring(char)
@@ -112,23 +118,28 @@ module AresMUSH
     end
     
     def has_liked?(char)
-      self.likers.include?(char)
+      self.scene_likes.any? { |s| s.character == char }
     end
     
     def like(char)
       if (!self.has_liked?(char))
-        self.likers.add char
+        SceneLike.create(character: char, scene: self)
       end
     end
 
     def unlike(char)
       if (self.has_liked?(char))
-        self.likers.delete char
+        like = char.scene_likes.select { |s| s.scene == self }.first
+        like.delete
       end
     end
     
     def likes
-      self.likers.count
+      self.scene_likes.count
+    end
+    
+    def live_url
+      "#{Game.web_portal_url}/scene-live/#{self.id}"
     end
     
     def url

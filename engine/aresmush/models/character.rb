@@ -37,10 +37,18 @@ module AresMUSH
       return [] if !name_or_id
             
       if (name_or_id.start_with?("#"))
-        return find_any_by_id(name_or_id)
+        return find_any_by_id(name_or_id.upcase)
       end
       
-      find(name_upcase: name_or_id.upcase).union(alias_upcase: name_or_id.upcase).to_a
+      found = find(name_upcase: name_or_id.upcase).union(alias_upcase: name_or_id.upcase).to_a
+      return found if found.any?
+      
+      found = Character.all.select { |c| c.name_upcase.start_with?(name_or_id.upcase) }
+      if (found.count == 1)
+        return found
+      else
+        return []
+      end
     end
 
     def self.find_one_by_name(name_or_id)      

@@ -28,7 +28,7 @@ module AresMUSH
         :description => "Welcome!%R%R" + 
         "New to MUSHing?  Visit http://aresmush.com/mush-101/ for an interactive tutorial.%R%R" +
         "New to Ares?  http://aresmush.com/tutorials/play/ares-for-vets.html for a quick intro geared towards veteran players.%R%R" +
-        "You may need to configure your MUSH client to take full advantage of Ares' features.  See https://aresmush.com/clients.html for details.%R%R" +
+        "You may need to configure your MU Client to take full advantage of Ares' features.  See https://aresmush.com/clients.html for details.%R%R" +
         "Type %xcchannels%xn for a list of available chat channels and the commands to speak on them.")
 
       ic_start_room = Room.create(
@@ -76,7 +76,7 @@ module AresMUSH
       approved_role = Role.create(name: "approved")
       approved_role.update(permissions: ["go_home", "boot", "announce"] )
       coder_role = Role.create(name: "coder")
-      coder_role.update(permissions: ["manage_game", "access_jobs"])
+      coder_role.update(permissions: ["manage_game", "access_jobs", "tinker"])
       
       puts "Creating OOC chars."
       
@@ -125,12 +125,12 @@ module AresMUSH
       board.write_roles.add admin_role
       board.save
       
-      board = BbsBoard.create(name: "Cookie Awards", order: 3)
+      board = BbsBoard.create(name: "New Arrivals", order: 3)
       board.write_roles.add approved_role
       board.save
       
-      board = BbsBoard.create(name: "New Arrivals", order: 4)
-      board.write_roles.add approved_role
+      board = BbsBoard.create(name: "Trending Scenes", order: 4)
+      board.write_roles.add admin_role
       board.save
   
       channel = AresMUSH::Channel.create(name: "Chat", 
@@ -162,7 +162,8 @@ module AresMUSH
         description: "Admin business.",
         color: "%xr")
       channel.default_alias = [ 'a', 'ad', 'adm' ]
-      channel.roles.add admin_role
+      channel.join_roles.add admin_role
+      channel.talk_roles.add admin_role
       channel.save
   
   
@@ -170,6 +171,26 @@ module AresMUSH
       
       home = WikiPage.create(name: "home")
       WikiPageVersion.create(wiki_page: home, text: "Wiki home page", character: Game.master.system_character)
+      
+      puts "Creating job categories."
+      
+      categories = {
+        'APP' => "%xm",
+        'BUILD' => "%xy",
+        'BUG' => "%xr",
+        'CODE' => "%xy",
+        'ALERT' => "%xr",
+        'MISC' => "%xh",
+        'PLOT' => "%xc",
+        'REQ' => "%xm",
+        'RP' => "%xc",
+        'SYS' => "%xh"
+      }
+     
+      categories.each do |name, color|
+        JobCategory.create(name: name, color: color)
+      end
+          
       
       puts "Install complete."
     end

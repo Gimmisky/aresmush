@@ -25,10 +25,14 @@ module AresMUSH
             end
           end
           scene.scene_log.update(log: request.args[:log])
+          
+          Website.add_to_recent_changes('scene', t('scenes.scene_updated', :title => scene.title), { id: scene.id }, enactor.name)
+          
         end
         
         scene.update(location: request.args[:location])
-        scene.update(summary: request.args[:summary])
+        scene.update(summary: Website.format_input_for_mush(request.args[:summary]))
+        scene.update(content_warning: request.args[:content_warning])
         scene.update(scene_type: request.args[:scene_type])
         scene.update(title: request.args[:title])
         scene.update(icdate: request.args[:icdate])
@@ -43,12 +47,17 @@ module AresMUSH
         end
         
         participant_names = request.args[:participants] || []
-        scene.participants.replace []
+        participant_names_upcase = participant_names.map { |p| p.upcase }
+        scene.participants.each do |p|
+          if (!participant_names_upcase.include?(p.name_upcase))
+            scene.participants.delete p
+          end
+        end
       
         participant_names.each do |p|
           participant = Character.find_one_by_name(p.strip)
           if (participant)
-            Scenes.add_participant(scene, participant)
+            Scenes.add_participant(scene, participant, enactor)
           end
         end
       

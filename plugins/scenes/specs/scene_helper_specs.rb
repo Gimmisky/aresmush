@@ -50,7 +50,7 @@ module AresMUSH
           
           it "should format with color and <OOC> tag" do
             allow(@enactor_room).to receive(:characters) { [ @char1 ] }
-            expect(Scenes).to receive(:custom_format).with("%xb<OOC>%xn A pose", @char1, @enactor, false, true, nil)
+            expect(Scenes).to receive(:custom_format).with("%xb<OOC>%xn A pose", @enactor_room, @char1, @enactor, false, true, nil)
             Scenes.emit_pose(@enactor, "A pose", false, true)
           end
 
@@ -79,7 +79,7 @@ module AresMUSH
           
           it "should format a set pose with bracketed lines" do
             allow(@enactor_room).to receive(:characters) { [ @char1 ] }
-            expect(Scenes).to receive(:custom_format).with("%R%xh%xc%% #{'-'.repeat(75)}%xn%R%RA pose%R%R%xh%xc%% #{'-'.repeat(75)}%xn%R", @char1, @enactor, true, false, nil)
+            expect(Scenes).to receive(:custom_format).with("%R%xh%xc%% #{'-'.repeat(75)}%xn%R%RA pose%R%R%xh%xc%% #{'-'.repeat(75)}%xn%R", @enactor_room, @char1, @enactor, true, false, nil)
             Scenes.emit_pose(@enactor, "A pose", false, false, nil, true)
           end
           
@@ -111,7 +111,7 @@ module AresMUSH
           
           it "should format a regular pose normally" do
             allow(@enactor_room).to receive(:characters) { [ @char1 ] }
-            expect(Scenes).to receive(:custom_format).with("A pose", @char1, @enactor, false, false, nil)
+            expect(Scenes).to receive(:custom_format).with("A pose", @enactor_room, @char1, @enactor, false, false, nil)
             Scenes.emit_pose(@enactor, "A pose", false, false, nil, false)
           end
           
@@ -140,7 +140,7 @@ module AresMUSH
           
           it "should use the place name in formatting" do
             allow(@enactor_room).to receive(:characters) { [ @char1 ] }
-            expect(Scenes).to receive(:custom_format).with("A pose", @char1, @enactor, false, false, "A place")
+            expect(Scenes).to receive(:custom_format).with("A pose", @enactor_room, @char1, @enactor, false, false, "A place")
             Scenes.emit_pose(@enactor, "A pose", false, false, "A place", false)
           end
         end
@@ -156,7 +156,7 @@ module AresMUSH
           
           it "should format a regular pose normally" do
             allow(@scene_room).to receive(:characters) { [ @char1 ] }
-            expect(Scenes).to receive(:custom_format).with("A pose", @char1, @enactor, false, false, nil)
+            expect(Scenes).to receive(:custom_format).with("A pose", @scene_room, @char1, @enactor, false, false, nil)
             Scenes.emit_pose(@enactor, "A pose", false, false, nil, false, @scene_room)
           end
           
@@ -184,6 +184,48 @@ module AresMUSH
           end          
         end
         
+      end
+      
+      describe :handle_scene_participation_achievement do
+        before do 
+          @char = double
+          @scene = double
+          allow(@scene).to receive(:id) { 123 }
+          allow(@scene).to receive(:scene_type) { "event" }
+        end
+        
+        it "should not award anything if char already participated in scene." do
+          expect(Scenes).to receive(:participated_in_scene?).with(@char, @scene) { true }
+          expect(Achievements).to_not receive(:award_achievement).with(@char, "scene_participant", 1)
+          Scenes.handle_scene_participation_achievement(@char, @scene)
+        end
+        
+        it "should use the level not the count for awards." do
+          expect(Scenes).to receive(:participated_in_scene?).with(@char, @scene) { false }
+          expect(@char).to receive(:scenes_participated_in) { [ "1", "2" ]}
+          expect(Achievements).to receive(:award_achievement).with(@char, "scene_participant_event")
+          expect(Achievements).to receive(:award_achievement).with(@char, "scene_participant", 1)
+          expect(@char).to receive(:update).with(:scenes_participated_in => [ "1", "2", "123" ])
+          Scenes.handle_scene_participation_achievement(@char, @scene)
+        end
+        
+        it "should award new level once they get enough scenes" do
+          expect(Scenes).to receive(:participated_in_scene?).with(@char, @scene) { false }
+          expect(@char).to receive(:scenes_participated_in) { [ "1", "2", "3", "4", "5", "6", "7", "8", "9" ]}
+          expect(Achievements).to receive(:award_achievement).with(@char, "scene_participant_event")
+          expect(Achievements).to receive(:award_achievement).with(@char, "scene_participant", 10)
+          expect(@char).to receive(:update).with(:scenes_participated_in => [ "1", "2", "3", "4", "5", "6", "7", "8", "9", "123" ])
+          Scenes.handle_scene_participation_achievement(@char, @scene)
+        end
+        
+        it "should award type achievement" do
+          expect(Scenes).to receive(:participated_in_scene?).with(@char, @scene) { false }
+          expect(@char).to receive(:scenes_participated_in) { [] }
+          expect(Achievements).to receive(:award_achievement).with(@char, "scene_participant_event")
+          expect(Achievements).to receive(:award_achievement).with(@char, "scene_participant", 1)
+          expect(@char).to receive(:update).with(:scenes_participated_in => [ "123" ])
+          Scenes.handle_scene_participation_achievement(@char, @scene)
+        end
       end
     end
   end

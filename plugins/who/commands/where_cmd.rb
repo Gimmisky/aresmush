@@ -15,7 +15,7 @@ module AresMUSH
       end
       
       def handle
-        online_chars = Global.client_monitor.logged_in.map { |client, char| char }
+        online_chars = Who.all_online
         if (self.search)
           online_chars = online_chars.select { |char| char.name =~ /^#{search}/  }
         end
@@ -25,7 +25,7 @@ module AresMUSH
         when "friends"
           online_chars = online_chars.select { |char| enactor.is_friend?(char)  }
         end
-        template = WhereTemplate.new online_chars
+        template = WhereTemplate.new online_chars, client
         client.emit template.render
       end      
     end

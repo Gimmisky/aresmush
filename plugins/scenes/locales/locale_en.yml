@@ -14,14 +14,11 @@ en:
         organizer_deleted: "(Organizer Deleted)"
         last_activity: "Last Activity: "
         
-        whisper_emit: "%{name} whispers to %{target}, \"%{message}\""
-        whisper_emit_header: "%xc%% Private whisper:%xn"
-        
         grid_scene: "On Grid"
         temproom_scene: "Temp Room"
         
         scene_ending: "%{name} has stopped this scene."
-        scene_ending_public: "%{name} has stopped this scene.  You can restart it at any time using scene/restart, but it will restart in a temp room and NOT in this room."
+        scene_ending_public: "%{name} has stopped this scene.  You can restart it at any time, but it will restart in a temp room and NOT in this room."
         scene_stopped: "The scene has ended.  To share the log, set the scene info (help scene info) and then use `scene/share %{id}` to share it."
         scene_not_specified: "You must either be in a room with an active scene, or specifiy a scene number for this command."
         scene_not_found: "Scene not found."
@@ -34,7 +31,7 @@ en:
         scene_already_completed: "That scene is already over."
         announce_scene_start: "%{name} has started a new %xh%{privacy}%xH scene (%{num}) here."
         location_set: "%{name} changed the scene location to %{location}."
-        scene_nag:  "There's no scene running here.  Starting a scene will activate repose and make it easy to share the scene with the web portal.  Just do `scene/start` if you want to start one."
+        scene_nag:  "There's no scene running here.  Starting a scene will enable repose, playing from the web portal, and other features.  Just do `scene/start` if you want to start one."
         open: "Open"
         private: "Private"
         scene_already_going: "There's already a scene going in this room.  You have to stop it first."
@@ -50,7 +47,7 @@ en:
         cant_share_until_completed: "You can't share a scene until it's completed."
         grid_location_change_warning: "This is a grid room.  You can note a location change in the scene log, but new arrivals may think you're still in the original location.  It may be better to stop the scene and restart it in a temp room."
         
-        scene_delete_warn: "Your scene %{id} (title: %{title}) will be deleted in a few days if it it remains unshared."
+        scene_delete_warn: "Your scene %{id} (title: %{title}) will be deleted in a few days if it it remains unshared. %{url}"
         scene_delete_warn_subject: "Unshared Scene Deletion"
         
         logging_not_enabled: "The scene log is not on."
@@ -75,7 +72,7 @@ en:
         scene_not_shared: "That scene is not shared."
         no_scene_room: "That scene doesn't have a room to join.  That can happen if it's created from the web portal."
         log_list_short_footer: "Only the last few poses are shown.  For the entire log, use `scene/log`."
-        scene_active_footer: "Only active scenes are shown.  For completed scenes, use `scenes/all`."
+        scene_active_footer: "Scene views: scenes/open, scenes/all, scenes/unshared."
 
         log_shared: "The log has been shared, and will now appear on the web portal."
         log_unshared: "The log is no longer being shared on the web portal."
@@ -112,21 +109,24 @@ en:
         pose_nudge_muted: "Pose notifications are muted until your next login."
         pose_nudge_options: "Use on, off or mute."
         not_in_pose_order: "%{name} is not in the pose order."
-        pose_order_dropped: "Dropping %{dropped} from pose order. (by %{name})"
+        pose_order_dropped: "%{name} dropped %{dropped} from pose order."
         pose_order_mistake: "It seems like you meant to use pose/order instead."
         invalid_pose_order_type: "That is not a valid pose order type.  Try one of these: %{types}"
         pose_order_type_changed: "%{name} has changed the pose order type to %{type}."
         
         edited_scene_pose: "%{name} has edited their pose: %xn%R%{pose}"
+        edited_scene_ooc: "%{name} has edited their OOC comment: %{pose}"
         deleted_scene_pose: "%{name} has deleted their pose: %{pose}"
+        deleted_scene_ooc: "%{name} has deleted their OOC comment: %{pose}"
         typo_scene_pose: "You fix the typo in the log:%R%{pose}"
         
         trending_scenes_subject: "Popular Scenes This Week"
         
         scene_char_invited: "You invite %{name} to join the scene."
         scene_char_uninvited: "You withdraw the invitation for %{name} to join the scene."
-        scene_notify_invite: "%{name} has invited you to join their scene.  Use scene/join %{num} to join in."
+        scene_notify_invite: "You have been invited to scene %{num}.  Use scene/join %{num} to join in."
         scene_notify_uninvited: "%{name} has withdrawn the invitation to join scene %{num}."
+        scene_notify_added_to_scene: "You have been added to scene %{num}."
         
         no_talking_quiet_room: "Sssh.  This is the quiet room."
         no_talking_ooc_lounge: "Chatting in the OOC lounge is sent to the %{channel} channel so everyone can participate.  Make sure you've joined and un-muted that channel if you want to chat here."
@@ -139,3 +139,10 @@ en:
         not_a_part_of_scene: "You are not participating in that scene."
         left_scene: "You leave the scene."
         web_scene_started: "You start a new scene (%{num}).  You can join the scene using `scene/join %{num}` or find it on the web portal's active scenes page."
+        
+        new_scene_activity: "New activity in scene %{id}."
+        scene_updated: "%{title} updated."
+        scene_reported: "Thank you.  A report has been created using the scene log as evidence."
+        
+        scene_reported_body: "%{reporter} has reported scene #%{scene_num}.%R%RReason:%R"
+        scene_reported_title: "Scene Reported"

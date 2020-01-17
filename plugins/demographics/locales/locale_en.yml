@@ -1,7 +1,7 @@
 en:
     demographics:
         actor_not_set: None Set
-        actors_title: Actors
+        actors_title: Played By List
         actor_taken: That actor is already taken.
 
         admin_property_set: "You set %{name}'s %{property} to %{value}."
@@ -9,27 +9,15 @@ en:
         invalid_demographic: "That is not a valid demographic."
         
         property_set: "You set your %{property} to %{value}."
-        invalid_gender: "Please pick: male, female, other."
+        invalid_gender: "Please pick one of these: %{genders}."
         invalid_age: "Please enter a number of years."
         age_outside_limits: "The minimum age is %{min} and the maximum age is %{max}."
         birthdate_set: "Your birthdate has been set to %{birthdate}, making you %{age} years old."
         invalid_birthdate: "Please specify a date in %{format_str} format."
         
-        male_possessive: his
-        female_possessive: her
-        other_possessive: their
-        male_objective: him
-        female_objective: her
-        other_objective: them
-        male_subjective: he
-        female_subjective: she
-        other_subjective: they
-        male_noun: man
-        female_noun: woman
-        other_noun: person
-        
         demo_review: Checking all demographics are set.
-        gender_set_to_other: "< Gender is set to 'Other'.  Is that correct? >"
+        gender_set_to_other: "< Gender is set to 'Other'.  Just making sure that's intentional. >"
+        duplicate_played_by: "< That played by is already taken. >"
         icon_set: "Icon set."
         
         group_types_title: "Group Types"
@@ -47,6 +35,7 @@ en:
         skill_census_title: "Skill Census - %{type} Skills"
         rank_census_title: "Rank Census"
         invalid_skill_census_type: "Invalid skill census type.  Try one of these: %{types}."
+        invalid_census_type: "Invalid census type.  Try one of these: %{types}."
         
         census_types: "Census Types"
         census_groups: "Census Groups Available"

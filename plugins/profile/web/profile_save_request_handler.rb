@@ -29,12 +29,12 @@ module AresMUSH
         end
         
         tags = (request.args[:tags] || []).map { |t| t.downcase }.select { |t| !t.blank? }
-        gallery = (request.args[:gallery] || []).map { |g| g.downcase }
+        gallery = (request.args[:profile_gallery] || '').split.map { |g| g.downcase }
         profile_image = build_image_path(char, request.args[:profile_image])
         profile_icon = build_image_path(char, request.args[:profile_icon])
-        char.update(profile_gallery: gallery)
         char.update(profile_image: profile_image)
         char.update(profile_icon: profile_icon)
+        char.update(profile_gallery: gallery)
         char.update(profile_tags: tags)
         
         relationships = {}
@@ -42,7 +42,9 @@ module AresMUSH
           relationships[name] = {
             'relationship' => Website.format_input_for_mush(data['text']),
             'order' => data['order'].blank? ? nil : data['order'].to_i,
-            'category' => data['category'].blank? ? "Associates" : data['category'].titleize
+            'category' => data['category'].blank? ? "Associates" : data['category'].titleize,
+            'is_npc' => (data['is_npc'] || "").to_bool,
+            'npc_image' => data['npc_image'].blank? ? nil : data['npc_image']
             }
         end
         
@@ -51,6 +53,8 @@ module AresMUSH
         char.update(bg_shared: request.args[:bg_shared].to_bool)
         char.update(idle_lastwill: Website.format_input_for_mush(request.args[:lastwill]))
         
+        relation_category_order = (request.args[:relationships_category_order] || "").split(',')
+        char.update(relationships_category_order: relation_category_order)
         
         ## DO PROFILE LAST SO IT TRIGGERS THE SOURCE HISTORY UPDATE
         profile = {}
@@ -59,7 +63,7 @@ module AresMUSH
         end
         char.set_profile(profile, enactor)
         
-        Achievements.award_achievement(enactor, "profile_edit", 'portal', "Edited your character profile.")
+        Achievements.award_achievement(enactor, "profile_edit")
         
         
         {    

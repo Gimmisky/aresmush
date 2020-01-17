@@ -24,13 +24,16 @@ module AresMUSH
           end
           if (enactor)
             scene.mark_read(enactor)
+            Login.mark_notices_read(enactor, :scene, scene.id)
           end
         end
         
         if (edit_mode)
           log = scene.shared ? scene.scene_log.log : nil
+          summary = Website.format_input_for_html(scene.summary)
         else
           log = Website.format_markdown_for_html(scene.scene_log.log)
+          summary = Website.format_markdown_for_html(scene.summary)
         end
         
         participants = scene.participants.to_a
@@ -43,7 +46,8 @@ module AresMUSH
           location: scene.location,
           completed: scene.completed,
           shared: scene.shared,
-          summary: scene.summary,
+          summary: summary,
+          content_warning: scene.content_warning,
           tags: scene.tags,
           icdate: scene.icdate,
           participants: participants,
@@ -51,7 +55,7 @@ module AresMUSH
           scene_type: scene.scene_type ? scene.scene_type.titlecase : 'unknown',
           log: log,
           plot: scene.plot ? { title: scene.plot.title, id: scene.plot.id } : nil,
-          related_scenes: scene.related_scenes.map { |r| { title: r.date_title, id: r.id }},
+          related_scenes: scene.related_scenes.sort_by { |r| r.date_title }.map { |r| { title: r.date_title, id: r.id }},
           can_edit: enactor && Scenes.can_edit_scene?(enactor, scene),
           can_delete: Scenes.can_delete_scene?(enactor, scene),
           has_liked: enactor && scene.has_liked?(enactor),

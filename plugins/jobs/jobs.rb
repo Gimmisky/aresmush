@@ -17,14 +17,28 @@ module AresMUSH
       case cmd.root
       when "job"
         case cmd.switch
+        when "addparticipant", "removeparticipant"
+          return JobChangeParticipantCmd
         when "all"
           return ListJobsCmd
         when "backup"
           return JobsBackupCmd
         when "cat"
           return ChangeCategoryCmd
+        when "categories"
+          return ListJobCaegoriesCmd
+        when "categorycolor"
+          return JobCategoryColorCmd
+        when "categorytemplate"
+          return JobCategoryTemplateCmd
+        when "categoryroles"
+          return JobCategoryRolesCmd
+        when "createcategory"
+          return CreateJobCategoryCmd
         when "catchup"
           return JobsCatchupCmd
+        when "deletecategory"
+          return DeleteJobCategoryCmd
         when "discuss", "respond"
           return JobCommentCmd
         when "close"
@@ -49,6 +63,10 @@ module AresMUSH
           return PurgeJobsCmd
         when "query"
           return CreateQueryJobCmd
+        when "renamecategory"
+          return RenameJobCategoryCmd
+        when "scan"
+          return JobScanCmd
         when "search"
           return JobSearchCmd
         when "status"
@@ -67,6 +85,8 @@ module AresMUSH
          
       when "request"
         case cmd.switch
+        when "addparticipant", "removeparticipant"
+          return JobChangeParticipantCmd
         when "all"
           return ListRequestsCmd
         when "respond"
@@ -92,7 +112,14 @@ module AresMUSH
     end
 
     def self.get_event_handler(event_name) 
-      nil
+      case event_name
+      when "CronEvent"
+        return JobArchiveCronHandler
+      when "RoleDeletedEvent"
+        return RoleDeletedEventHandler
+      else
+        return nil
+      end
     end
     
     def self.get_web_request_handler(request)
@@ -101,6 +128,8 @@ module AresMUSH
         return JobsRequestHandler
       when "job"
         return JobRequestHandler
+      when "jobChangeParticipants"
+        return JobChangeParticipantsRequestHandler
       when "jobCreate"
         return JobCreateRequestHandler
       when "jobReply"

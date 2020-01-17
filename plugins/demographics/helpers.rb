@@ -2,10 +2,12 @@ module AresMUSH
   module Demographics    
 
     def self.can_set_demographics?(char)
+      return false if !char
       char.has_permission?("manage_demographics")
     end
 
     def self.can_set_group?(char)
+      return false if !char
       char.has_permission?("manage_demographics")
     end
 
@@ -17,6 +19,24 @@ module AresMUSH
       Global.read_config("demographics", "groups") || {}
     end
     
+    def self.genders
+      gender_config = Global.read_config("demographics", "genders") 
+      return [ 'Male', 'Female', 'Other' ] if !gender_config
+      gender_config.keys
+    end
+    
+    def self.gender_config(gender)
+      all_config = Global.read_config("demographics", "genders") || {}
+      default_config = {
+        'subjective_pronoun' => 'they',
+        'objective_pronoun' => 'them',
+        'possessive_pronoun' => 'their',
+        'noun' => 'person'
+      }
+      return default_config if !gender
+      all_config[gender.titlecase] || default_config
+    end
+    
     def self.get_group(name)
       return nil if !name
       key = all_groups.keys.find { |g| g.downcase == name.downcase }
@@ -26,8 +46,13 @@ module AresMUSH
     
     def self.census_types
       types = Demographics.all_groups.keys.map { |t| t.titlecase }
-      types << 'Gender'
+      if (Demographics.all_demographics.include?('gender'))
+        types << 'Gender'
+      end
       types << 'Timezone'
+      if (Demographics.all_demographics.include?('played by'))
+        types << 'Played By'
+      end
       if (Ranks.is_enabled?)
         types << 'Rank'
       end

@@ -10,6 +10,10 @@ module AresMUSH
       Global.read_config("fs3combat", "shortcuts")
     end
  
+    def self.achievements
+      Global.read_config('fs3combat', 'achievements')
+    end
+ 
     def self.get_cmd_handler(client, cmd, enactor)
       case cmd.root
       when"damage"
@@ -22,6 +26,11 @@ module AresMUSH
            return DeleteDamageCmd
          when nil
            return DamageCmd
+         end
+       when "gear"
+         case cmd.switch
+         when "check"
+           return GearCheckCmd
          end
        when "treat"
          return TreatCmd
@@ -180,14 +189,22 @@ module AresMUSH
         return CombatsRequestHandler
       when "combatSetup"
         return CombatSetupRequestHandler
+      when "newCombatTurn"
+        return NewCombatTurnRequestHandler
       when "saveCombatSetup"
         return SaveCombatSetupRequestHandler
+      when "saveCombatTeams"
+        return SaveCombatTeamsRequestHandler
       when "combatLog"
         return CombatLogRequestHandler
       when "gear"
         return GearListRequestHandler
       when "gearDetail"
         return GearDetailRequestHandler
+      when "startCombat"
+        return StartCombatRequestHandler
+      when "stopCombat"
+        return StopCombatRequestHandler
       end
     end
   end

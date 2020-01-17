@@ -11,6 +11,13 @@ module AresMUSH
     set :room_owners, "AresMUSH::Character"
     reference :area, "AresMUSH::Area"
     
+    before_delete :clear_exits
+    
+    def clear_exits
+      self.exits.each { |e| e.delete }
+      self.exits_in.each { |e| e.delete }
+    end
+    
     def grid_x
       self.room_grid_x
     end
@@ -33,6 +40,14 @@ module AresMUSH
     
     def name_and_area
       self.area ? "#{self.area.name}/#{self.name}" : self.name
+    end
+    
+    def grid_marker
+      if (self.grid_x && self.grid_y)
+        "(#{self.grid_x},#{self.grid_y})"
+      else
+        nil
+      end
     end
     
     def self.find_by_name_and_area(search, enactor_room = nil)

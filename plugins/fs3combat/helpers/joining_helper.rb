@@ -62,14 +62,10 @@ module AresMUSH
     
     def self.handle_combat_join_achievement(char)
       char.update(combats_participated_in: char.combats_participated_in + 1)
-      [ 1, 10, 20, 50, 100 ].each do |count|
+      [ 1, 10, 20, 50, 100 ].reverse.each do |count|
         if (char.combats_participated_in >= count)
-          if (count == 1)
-            message = "Joined a combat."
-          else
-            message = "Joined #{count} combats."
-          end
-          Achievements.award_achievement(char, "fs3_joined_combat_#{count}", 'fs3', message)
+          Achievements.award_achievement(char, "fs3_joined_combat", count)
+          break
         end
       end
     end

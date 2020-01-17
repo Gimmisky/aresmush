@@ -57,7 +57,7 @@ en:
         # ----------------------------
         
         active_combats: "Active Combats"
-        active_combats_titlebar: "#   Organizer       Participants"
+        active_combats_titlebar: "#   Scene Organizer       Participants"
         invalid_combat_type: "That is no a valid combat type.  Try one of these: %{types}."
         summary_title: "Combatant       Act/Pose   Skill    Weapon           Armor            Stance"
         hud_subtitle: "%xhCombatant           Damage    Weapon(ammo)             Action(stance)%xn"
@@ -96,6 +96,9 @@ en:
         new_passenger: "%{name} is now a passenger in %{vehicle}."
         disembarks_vehicle: "%{name} disembarks from %{vehicle}."
                     
+        already_combat_for_scene: "There's already a combat going on in that scene."
+        combat_scene_started: "%{name} has started a combat for this scene."
+        
         # ----------------------------
         # GENERAL
         # ----------------------------
@@ -175,12 +178,14 @@ en:
         weapon_title_has_shrapnel: "Has Shrapnel:" 
         weapon_title_reload_turns: "Reload Time:"
         weapon_title_allowed_specials: "Allowed Specials:"
+        weapon_title_init_mod: "Initiative Mod:"
         weapon_title_skill: "Skill:"
         invalid_weapon_special: "%{special} is not a valid special for that weapon."
         use_explode_command: "Use the combat/explode command for this weapon."
         use_suppress_command: "Use the combat/suppress command for this weapon."
         weapon_specials:  "Available Weapon Specials"
         invalid_gear_type: "Invalid gear type."
+        attack_with_missing_weapon: "COMBAT ERROR: Weapon %{name} does not exist. Check game config."
         
         # ----------------------------
         # ARMOR
@@ -315,6 +320,7 @@ en:
         
         attack_stopped_by_armor: "%{name} attacks %{target} with %{weapon}.  Stopped by ARMOR on %{hitloc}."
         reduced_by_armor:  "(Reduced by ARMOR)"
+        has_no_target: "%{name} tries to attack but has no target."
         
         crew_hit: "CREW HIT!"
 

@@ -23,7 +23,7 @@ module AresMUSH
       char.update(roster_contact: contact || Global.read_config("idle", "default_contact"))
       char.update(idle_state: "Roster")
       char.update(roster_played: char.is_approved?)  # Assume played if approved.
-      Idle.idle_cleanup(char)
+      Idle.idle_cleanup(char, "Roster")
     end
     
     def self.remove_from_roster(char)
@@ -34,14 +34,13 @@ module AresMUSH
       actor.has_any_role?(Global.read_config("idle", "idle_exempt_roles"))
     end
     
-    def self.idle_cleanup(char)
+    def self.idle_cleanup(char, idle_status)
       # Remove their handle.              
       if (char.handle)
         char.handle.delete
       end
       Login.set_random_password(char)
-      char.update(profile_tags: char.profile_tags.select { |t| !t.start_with?("player:") })
-      char.reset_xp
+      Global.dispatcher.queue_event CharIdledOutEvent.new(char.id, idle_status)
     end
     
     def self.idle_action_color(action)
@@ -83,10 +82,14 @@ module AresMUSH
        forum_category = Global.read_config("idle", "arrivals_category")
        return if !forum_category
        return if forum_category.blank?
-     
+
+       arrival_message = Global.read_config("idle", "roster_arrival_msg")
+       arrival_message_args = Chargen.welcome_message_args(model)
+       post_body = arrival_message % arrival_message_args
+      
        Forum.post(forum_category, 
        t('idle.roster_post_subject'), 
-       t('idle.roster_post_body', :name => model.name), 
+       post_body, 
        Game.master.system_character)
          
        return { password: password }

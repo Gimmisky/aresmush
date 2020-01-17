@@ -266,14 +266,14 @@ module AresMUSH
         
         it "should choose reload if out of ammo" do
           expect(FS3Combat).to receive(:check_ammo).with(@combatant, 1) { false }
-          expect(FS3Combat).to receive(:set_action).with(@client, nil, @combat, @combatant, FS3Combat::ReloadAction, "")
-          FS3Combat.ai_action(@combat, @client, @combatant)
+          expect(FS3Combat).to receive(:set_action).with(nil, @combat, @combatant, FS3Combat::ReloadAction, "")
+          FS3Combat.ai_action(@combat, @combatant)
         end
         
         it "should choose escape if subdued" do
           allow(@combatant).to receive(:is_subdued?) { true }
-          expect(FS3Combat).to receive(:set_action).with(@client, nil, @combat, @combatant, FS3Combat::EscapeAction, "")
-          FS3Combat.ai_action(@combat, @client, @combatant)
+          expect(FS3Combat).to receive(:set_action).with(nil, @combat, @combatant, FS3Combat::EscapeAction, "")
+          FS3Combat.ai_action(@combat, @combatant)
         end
 
         describe "attack" do
@@ -291,28 +291,28 @@ module AresMUSH
                    
           it "should attack a random target" do
             expect(FS3Combat).to receive(:find_ai_target).with(@combat, @combatant) { @target2 }
-            expect(FS3Combat).to receive(:set_action).with(@client, nil, @combat, @combatant, FS3Combat::AttackAction, "Bob")
-            FS3Combat.ai_action(@combat, @client, @combatant)
+            expect(FS3Combat).to receive(:set_action).with(nil, @combat, @combatant, FS3Combat::AttackAction, "Bob")
+            FS3Combat.ai_action(@combat, @combatant)
           end
           
           it "should do nothing if no valid target found" do
             expect(FS3Combat).to receive(:find_ai_target).with(@combat, @combatant) { nil }
-            expect(FS3Combat).to receive(:set_action).with(@client, nil, @combat, @combatant, FS3Combat::PassAction, "")
-            FS3Combat.ai_action(@combat, @client, @combatant)
+            expect(FS3Combat).to receive(:set_action).with(nil, @combat, @combatant, FS3Combat::PassAction, "")
+            FS3Combat.ai_action(@combat, @combatant)
           end
           
           it "should use the explode action for explosive weapons" do
             expect(FS3Combat).to receive(:weapon_stat).with("Rifle", "weapon_type") { "Explosive" }            
-            expect(FS3Combat).to receive(:set_action).with(@client, nil, @combat, @combatant, FS3Combat::ExplodeAction, "Bob")
+            expect(FS3Combat).to receive(:set_action).with(nil, @combat, @combatant, FS3Combat::ExplodeAction, "Bob")
 
-            FS3Combat.ai_action(@combat, @client, @combatant)
+            FS3Combat.ai_action(@combat, @combatant)
           end
           
           it "should use the suppress action for suppressive weapons" do
             expect(FS3Combat).to receive(:weapon_stat).with("Rifle", "weapon_type") { "Suppressive" }            
-            expect(FS3Combat).to receive(:set_action).with(@client, nil, @combat, @combatant, FS3Combat::SuppressAction, "Bob")
+            expect(FS3Combat).to receive(:set_action).with(nil, @combat, @combatant, FS3Combat::SuppressAction, "Bob")
 
-            FS3Combat.ai_action(@combat, @client, @combatant)
+            FS3Combat.ai_action(@combat, @combatant)
           end
           
         end
@@ -712,6 +712,26 @@ module AresMUSH
           expect(@target).to receive(:update).with(:mount_type => nil)
           result = FS3Combat.determine_attack_margin(@combatant, @target, 0)
           expect(result[:message]).to eq "fs3combat.attack_hits_mount"
+          expect(result[:hit]).to eq false
+        end
+        
+        it "should be a near miss if attacker doesn't get enough success for called shot" do
+          allow(FS3Combat).to receive(:weapon_stat).with("Rifle", "weapon_type") { "Ranged" }
+          allow(FS3Combat).to receive(:roll_attack) { 2 }
+          allow(FS3Combat).to receive(:roll_defense) { 1 }
+          allow(@target).to receive(:is_in_vehicle?) { false }
+          result = FS3Combat.determine_attack_margin(@combatant, @target, 0, "Head")
+          expect(result[:message]).to eq "fs3combat.attack_near_miss"
+          expect(result[:hit]).to eq false
+        end
+        
+        it "should be a clean if called shot but attacker missed" do
+          allow(FS3Combat).to receive(:weapon_stat).with("Rifle", "weapon_type") { "Melee" }
+          allow(FS3Combat).to receive(:roll_attack) { 2 }
+          allow(FS3Combat).to receive(:roll_defense) { 3 }
+          allow(@target).to receive(:is_in_vehicle?) { false }
+          result = FS3Combat.determine_attack_margin(@combatant, @target, 0, "Head")
+          expect(result[:message]).to eq "fs3combat.attack_dodged"
           expect(result[:hit]).to eq false
         end
 

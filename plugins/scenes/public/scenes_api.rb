@@ -9,8 +9,8 @@ module AresMUSH
       Scenes.emit_pose(enactor, pose, true, false, nil, true)
     end
     
-    def self.colorize_quotes(enactor, pose, recipient)
-      Scenes.custom_format(pose, recipient, enactor)
+    def self.colorize_quotes(room, enactor, pose, recipient)
+      Scenes.custom_format(pose, room, recipient, enactor)
     end
     
     def self.format_autospace(enactor, autospace_str)
@@ -18,12 +18,13 @@ module AresMUSH
       autospace_str.gsub(/\%n/i, Demographics.name_and_nickname(enactor))
     end
     
-    def self.add_to_scene(scene, pose, character = Game.master.system_character, is_setpose = nil, is_ooc = nil)
+    def self.add_to_scene(scene, pose, character = Game.master.system_character, is_setpose = nil, is_ooc = nil, place_name = nil)
       return nil if !scene.logging_enabled
+      return nil if !pose
       
-      scene_pose = ScenePose.create(pose: pose, character: character, scene: scene, is_setpose: is_setpose, is_ooc: is_ooc)
+      scene_pose = ScenePose.create(pose: pose, character: character, scene: scene, is_setpose: is_setpose, is_ooc: is_ooc, place_name: place_name ? place_name : character.place_name(scene.room))
       if (!scene_pose.is_system_pose?)
-        Scenes.add_participant(scene, character)
+        Scenes.add_participant(scene, character, character)
       end
       
       scene.mark_unread(character)
@@ -33,10 +34,6 @@ module AresMUSH
       data[:pose_order] = Scenes.build_pose_order_web_data(scene)
 
       Scenes.new_scene_activity(scene, :new_pose, data.to_json)
-      if (!is_ooc)
-        Scenes.handle_word_count_achievements(character, pose)
-      end
-      
       return scene_pose
     end
     
@@ -44,7 +41,9 @@ module AresMUSH
       if (!scene.invited.include?(char))
         scene.invited.add char
       end
-      Login.emit_ooc_if_logged_in(char, t('scenes.scene_notify_invite', :name => enactor.name, :num => scene.id))        
+      message = t('scenes.scene_notify_invite', :name => enactor.name, :num => scene.id)
+      Login.emit_ooc_if_logged_in(char, message)        
+      Login.notify(char, :scene, message, scene.id)
     end
     
     def self.uninvite_from_scene(scene, char, enactor)
@@ -60,10 +59,13 @@ module AresMUSH
           private_scene: private_scene,
           scene_type: scene_type,
           temp_room: temp_room,
+          last_activity: Time.now,
           icdate: ICTime.ictime.strftime("%Y-%m-%d"))
 
       Global.logger.info "Scene #{scene.id} started by #{enactor.name} in #{temp_room ? 'temp room' : enactor.room.name}."
-          
+
+      scene.watchers.add enactor
+                
       if (temp_room)
         room = Scenes.create_scene_temproom(scene)
       else
@@ -74,6 +76,20 @@ module AresMUSH
         room.emit_ooc t('scenes.announce_scene_start', :privacy => private_scene ? "Private" : "Open", :name => enactor.name, :num => scene.id)
       end
       return scene
+    end
+    
+    def self.get_recent_scenes_web_data
+      Scenes.recent_scenes[0..9].map { |s| {
+                      id: s.id,
+                      title: s.title,
+                      summary: s.summary,
+                      location: s.location,
+                      content_warning: s.content_warning,
+                      icdate: s.icdate,
+                      participants: s.participants.to_a.sort_by { |p| p.name }.map { |p| { name: p.name, id: p.id, icon: Website.icon_for_char(p) }},
+                      scene_type: s.scene_type ? s.scene_type.titlecase : 'unknown',
+      
+                    }}
     end
     
   end

@@ -17,7 +17,7 @@ module AresMUSH
         end
         
         if (scene.shared)
-          return { error: t('scenes.scene_already_shared') }
+          return { shared: true }
         end
         
         if (!scene.logging_enabled)
@@ -30,6 +30,8 @@ module AresMUSH
           if (!Scenes.is_watching?(scene, enactor))
             scene.watchers.add enactor
           end
+          
+          Login.mark_notices_read(enactor, :scene, scene.id)
 
         end
         

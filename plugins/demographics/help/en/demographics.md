@@ -4,8 +4,8 @@ summary: Setting basic character demographics.
 ---
 # Demographics
 
-Demographics commands are used to set your basic character info.  Some items may not be changed after your character has been approved.
+Demographics commands are used to set your basic character info, like their hair and eye color. The specific list will vary by game.
 
-Use `<demographic name> <value>` to set a demographic.  For example:  `hair <hair color>`.
+> Learn about groups in the [Demographics and Groups Tutorial](/help/demographics_tutorial).
 
-For a complete list of demographics available, type `demographics`.
+`demographics` - Lists available demographics and the commands to set them.

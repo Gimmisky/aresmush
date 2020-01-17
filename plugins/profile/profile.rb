@@ -9,11 +9,17 @@ module AresMUSH
     def self.shortcuts
       Global.read_config("profile", "shortcuts")
     end
+    
+    def self.achievements
+      Global.read_config('profile', 'achievements')
+    end
  
     def self.get_cmd_handler(client, cmd, enactor)
       
       
       case cmd.root
+      when "backup"
+        return CharBackupCmd
       when "profile"
         case cmd.switch
         when "add"
@@ -38,6 +44,14 @@ module AresMUSH
         when nil
           return RelationshipsCmd
         end
+      end
+      nil
+    end
+    
+    def self.get_event_handler(event_name)
+      case event_name
+      when "CharIdledOutEvent"
+        return CharIdledOutEventHandler
       end
       nil
     end
