@@ -8,7 +8,7 @@ module AresMUSH
         
         Global.logger.debug "Loading game config."
         Global.config_reader.load_game_config
-        Global.help_reader.load_game_help
+        Help.reload_help
         Global.dispatcher.queue_event ConfigUpdatedEvent.new
         
         return nil
@@ -19,9 +19,15 @@ module AresMUSH
     end
     
     def self.announce(msg)
+      # Doesn't use notify_ooc because the prompt includes the %%
       Global.notifier.notify(:announcement, t('manage.announce', :message => msg)) do |char|
         true
       end
+    end
+    
+    def self.is_extra_installed?(name)
+      extras = Global.read_config('plugins', 'extras') || []
+      extras.include?(name)
     end
   end
 end

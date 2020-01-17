@@ -8,6 +8,7 @@ module AresMUSH
       max_xp = Global.read_config("fs3skills", "max_xp_hoard")
       xp = char.xp + amount
       xp = [max_xp, xp].min
+      xp = [0, xp].max
       char.update(fs3_xp: xp)
     end
     
@@ -50,11 +51,6 @@ module AresMUSH
       
       return max >= new_total ? nil : t('fs3skills.max_ability_points_reached')
     end
-
-    def self.skill_requires_training(ability)
-      skills_requiring_training = Global.read_config("fs3skills", "skills_requiring_training")
-      return (skills_requiring_training.include?(ability.name) && ability.rating <= 2)
-    end
     
     def self.learn_ability(char, name)
       return t('fs3skills.not_enough_xp') if char.xp <= 0
@@ -67,7 +63,12 @@ module AresMUSH
       end
       
       if (!ability)
-        FS3Skills.set_ability(char, name, 1)
+        error = FS3Skills.set_ability(char, name, 1)
+        if (error)
+          return error
+        end
+        ability = FS3Skills.find_ability(char, name)
+        FS3Skills.create_xp_job(char, ability)
       else
         
         error = FS3Skills.check_can_learn(char, name, ability.rating)
@@ -81,12 +82,10 @@ module AresMUSH
         end
         
         ability.learn
+        
         if (ability.learning_complete)
-          ability.update(xp: 0)
-          FS3Skills.set_ability(char, name, ability.rating + 1)
-          message = t('fs3skills.xp_raised_job', :name => char.name, :ability => name, :rating => ability.rating + 1)
-          category = Jobs.system_category
-          Jobs.create_job(category, t('fs3skills.xp_job_title', :name => char.name), message, Game.master.system_character)        
+          ability.update(xp: 0, rating: ability.rating + 1)
+          FS3Skills.create_xp_job(char, ability)
         end
         
       end 
@@ -94,6 +93,24 @@ module AresMUSH
       
       FS3Skills.modify_xp(char, -1)       
       return nil
+    end
+    
+    def self.create_xp_job(char, ability)
+      message = t('fs3skills.xp_raised_job', :name => char.name, :ability => ability.name, :rating => ability.rating)
+      category = Jobs.system_category
+      Jobs.create_job(category, t('fs3skills.xp_job_title', :name => char.name), message, Game.master.system_character)        
+    end
+    
+    def self.max_dots_in_action
+      base = Global.read_config("fs3skills", 'max_points_on_action') || 0
+      extra = Global.read_config("fs3skills", 'action_dots_beyond_chargen_max') || 0
+      base + extra
+    end
+    
+    def self.max_dots_in_attrs
+      base = (Global.read_config("fs3skills", 'max_points_on_attrs') || 0) / 2
+      extra = Global.read_config("fs3skills", 'attr_dots_beyond_chargen_max') || 0
+      base + extra
     end
   end
 end

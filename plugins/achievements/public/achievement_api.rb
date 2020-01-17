@@ -5,34 +5,43 @@ module AresMUSH
       !Global.plugin_manager.is_disabled?("achievements")
     end
     
-    def self.award_achievement(char, name, type = nil, message = nil)
-      return if char.is_admin? || char.is_npc? || char.is_guest?
+    def self.award_achievement(char, name, count = 0)
+      return nil if !Achievements.is_enabled?
+      return nil if char.is_admin? || char.is_npc? || char.is_guest?
       
-      achievement_data = Achievements.custom_achievement_data(name)
-      if (achievement_data)
-        if (!type)
-          type = achievement_data['type']
-        end
-        if (!message)
-          message = achievement_data['message']
-        end
+      Global.logger.info "Checking #{name} (#{count}) achievement for #{char.name}."
+      
+      achievement_details = Achievements.achievement_data(name)          
+      if (!achievement_details)
+        Global.logger.warn "Achievement not found: #{name}"
+        return t('achievements.invalid_achievement')
       end
+      
+      type = achievement_details['type']
+      message = achievement_details['message']
       
       if (!type || !message)
-        raise "Invalid achievement details.  Missing name or message."
+        raise "Invalid achievement details for #{name}.  Missing type or message."
       end
       
-      if (Achievements.is_enabled? && !Achievements.has_achievement?(char, name))
-        Achievement.create(character: char, type: type, name: name, message: message)
+      if (!Achievements.has_achievement?(char, name, count))
+        Global.logger.info "Awarding #{name} (#{count}) achievement to #{char.name}."
 
-        Mail.send_mail([char.name], t('achievements.achievement_mail_subject'), t('achievements.achievement_mail_message', :message => message), nil)          
+        message = message % { count: count }
+        achievement = char.achievements.select { |a| a.name == name }.first
         
-        channel_name = Global.read_config("achievements", "announce_channel")
-        if (!channel_name.blank?)
-          notification = t('achievements.achievement_earned', :name => char.name, :message => message)
-          Channels.send_to_channel(channel_name, notification)
+        if (achievement)
+          achievement.update(count: count, message: message)
+        else
+          achievement = Achievement.create(character: char, type: type, name: name, message: message, count: count)
         end
+
+        Login.notify(char, :achievement, t('achievements.achievement_noification_message', :message => message), achievement.id)
+        
+        notification = t('achievements.achievement_earned', :name => char.name, :message => message)
+        Channels.announce_notification(notification)
       end
+      return nil
     end
     
     def self.achievements_list(char)
@@ -57,7 +66,7 @@ module AresMUSH
           end
         end
       end
-      data.sort_by { |name, data| data[:type] }
+      data.sort_by { |name, data| [ data[:type], data[:message] ] }
     end
    
     def self.build_achievements(player)

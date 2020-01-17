@@ -30,7 +30,7 @@ en:
         page_review_index_title: "PM Conversations"
         invalid_thread: "No PM conversation with those characters was found."
         invalid_report_range: "Invalid page range.  Specify numbers from the page/log entries, like 2-10."
-        log_reported: "Thank you.  A report has been created using your page log with %{name} as evidence.  The page log has been reset and you can report this person again if needed."
+        pages_reported: "Thank you.  The conversation has been reported to the admins."
         page_reported_title: "Pages Reported"
         page_reported_body: "%{reporter} has reported an issue with the following pages from a conversation with %{name}.%R%RReason:%R"
         
@@ -39,3 +39,6 @@ en:
         recipient_is_offline: "%{name} is offline, but can get the message next time they're on."
         cant_page_just_yourself: "You can't page just yourself.  Maybe try the 'echo' command instead."
         cannot_continue_conversation: "You cannot continue this conversation because one of the characters no longer exists."
+        
+        new_pm: "New private messages in %{thread}."
+        more_on_portal: "Full message history is available on the web portal."

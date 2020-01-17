@@ -39,5 +39,17 @@ module AresMUSH
       end
       nil
     end
+    
+    def self.get_web_request_handler(request)
+      case request.cmd
+      when "changePlace"
+        return ChangePlaceRequestHandler   
+      when "viewPlaces" 
+        return ViewPlacesRequestHandler
+      when "leavePlace"
+        return LeavePlaceRequestHandler
+      end
+      nil
+    end
   end
 end

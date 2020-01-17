@@ -17,7 +17,6 @@ module AresMUSH
         it "should emit to the room" do
           room = double
           allow(@client).to receive(:room) { room }
-          allow(Places).to receive(:reset_place_if_moved)
           allow(@handler).to receive(:message) { "a message" }
           expect(Scenes).to receive(:emit_pose).with(@enactor, "a message", false, false)
           @handler.handle
@@ -31,8 +30,7 @@ module AresMUSH
         
         it "should format an emit message" do
           @handler = PoseCmd.new(@client, Command.new("emit test"), @enactor)
-          expect(PoseFormatter).to receive(:format).with("Bob", "\\test") { "formatted msg" }
-          expect(@handler.message("Bob")).to eq "formatted msg"
+          expect(@handler.message("Bob")).to eq "test"
         end
 
         it "should format a say message" do

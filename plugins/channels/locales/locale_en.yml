@@ -20,14 +20,14 @@ en:
         announce_enabled: "You will now see connection messages on %{name}."
         announce_disabled: "You will no longer see connection messages on %{name}."
         channels: Channels
-        channels_title: "Channel                       Description             Announce  Restricted To"
+        channels_title: "Channel                  Aliases         Description"
         channel_who: "On channel %{name}: %{chars}." 
         channel_aliases: "(+) = channel on     (X) = channel muted     (-) = channel off"
         unable_to_determine_auto_alias: "Could not automatically pick an alias for this channel due to name conflicts.  Use channel/join <name>=<alias> to pick one yourself."
         
         joined_channel: "%{name} has joined this channel."
-        already_on_channel: "That channel is already on."
-        not_on_channel: "That channel is already off."
+        already_on_channel: "You are already on that channel."
+        not_on_channel: "You are not on that channel."
         left_channel: "%{name} has left this channel."
         has_disconnected: "%{name} has disconnected."
         has_connected: "%{name} has connected."
@@ -50,7 +50,7 @@ en:
         channel_alias_set: "You can use %{channel_alias} to talk on the %{name} channel. "
         short_alias_warning: "Be aware that short channel aliases may conflict with other command shortcuts."
         alias_number_warning: "Numbers in channel aliases are ignored."
-        alias_notice: "You can use the channel/alias command to change your channel aliases."
+        alias_notice: "Use %xc<alias> <msg>%xn to talk on a channel.%RFor example: %xcq Hello!%xn to talk on the questions channel.%RYou can use the channel/alias command to change your channel aliases."
         channel_command_hint: "Type 'channels' to see the commands to talk on different channels."
         cant_use_channel: "You do not have permission to use that channel."
         did_you_mean_page: "It looks like you're trying to do a page but used the channel command accidentally."
@@ -63,3 +63,13 @@ en:
         char_removed_from_channel: "You remove %{char} from channel %{channel}."
         force_added: "You have been added to channel %{channel} by %{char}."
         force_removed: "You have been removed from channel %{channel} by %{char}."
+        
+        more_on_portal: "Full channel history is available on the web portal."
+        
+        everyone: Everyone
+        can_join_title: "Can Join:"
+        can_talk_title: "Can Talk:"
+        announce_logins_title: "Announce Logins:"
+        cant_talk_on_channel: "You aren't allowed to talk on that channel."
+        
+        channel_recall_cleared: "You clear the channel buffer on %{channel}."

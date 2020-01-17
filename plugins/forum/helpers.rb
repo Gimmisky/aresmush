@@ -44,9 +44,21 @@ module AresMUSH
       AresCentral.alts(char).each do |alt|
         post.mark_read(alt)
       end
+      Login.mark_notices_read(char, :forum, post.id)
     end    
       
-
+    def self.notify(post, category, type, message, data)
+      Global.notifier.notify_ooc(type, message) do |char|
+        !Forum.is_forum_muted?(char) &&
+        Forum.can_read_category?(char, category) &&
+        !Forum.is_category_hidden?(char, category)
+      end
+      
+      Global.client_monitor.notify_web_clients('new_forum_activity', "#{data.to_json}") do |char|
+        Forum.can_read_category?(char, category) &&
+        !Forum.is_category_hidden?(char, category)
+      end
+    end
     
     # Client may be nil for automated bbposts.  Otherwise it will be used
     # to emit error messages.
@@ -68,19 +80,24 @@ module AresMUSH
           Forum.mark_read_for_player(author, new_post)
         end
                
-        author_name = author ? author.name : t('forum.system_author')
+        author_name = author.name
         message = t('forum.new_post', :subject => subject, 
           :category => category.name, 
           :reference => new_post.reference_str,
           :author => author_name)
-                
-        Global.notifier.notify_ooc(:new_forum_post, message) do |char|
-          !Forum.is_forum_muted?(char) &&
-          Forum.can_read_category?(char, category) &&
-          !Forum.is_category_hidden?(char, category)
-        end
-
-        Forum.handle_forum_achievement(author, :post)
+        
+        Forum.add_recent_post(new_post)
+        data = {
+          category: category.id,
+          post: new_post.id,
+          author: {name: author_name, icon: Website.icon_for_char(author), id: author.id},
+          subject: subject,
+          message: Website.format_markdown_for_html(message),
+          raw_message: message,
+          type: 'new_forum_post'
+        }
+        Forum.notify(new_post, category, :new_forum_post, message, data)
+        Achievements.award_achievement(author, "forum_post")
         
         new_post
       end
@@ -96,7 +113,7 @@ module AresMUSH
         return
       end
 
-      reply = BbsReply.create(author: author, bbs_post: post, message: reply)
+      new_reply = BbsReply.create(author: author, bbs_post: post, message: reply)
         
       post.mark_unread
       Forum.mark_read_for_player(author, post)
@@ -106,13 +123,25 @@ module AresMUSH
         :reference => post.reference_str,
         :author => author.name)
       
-      Forum.handle_forum_achievement(author, :reply)
-      
-      Global.notifier.notify_ooc(:new_forum_post, message) do |char|
-        !Forum.is_forum_muted?(char) &&
-        Forum.can_read_category?(char, category) &&
-        !Forum.is_category_hidden?(char, category)
+        data = {
+          category: category.id,
+          post: post.id,
+          reply: new_reply.id,
+          author: { name: author.name, icon: Website.icon_for_char(author), id: author.id },
+          subject: post.subject,
+          message: Website.format_markdown_for_html(reply),
+          raw_message: reply,
+          type: 'forum_reply'
+        }
+        
+      Forum.add_recent_post(post)
+      Achievements.award_achievement(author, "forum_reply")
+      Forum.notify(post, category, :new_forum_reply, message, data)
+            
+      if (post.author && author != post.author)
+        Login.notify(post.author, :forum, t('forum.new_forum_reply', :subject => post.subject), post.id, "#{category.id}|#{post.id}")
       end
+      
     end
     
     # Important: Client may actually be nil here for a system-initiated bbpost.
@@ -173,18 +202,6 @@ module AresMUSH
       end
     end
     
-    def self.handle_forum_achievement(char, type)
-      if (type == :reply)
-        message = "Replied to a forum post."
-        type = "forum_reply"
-      else
-        message = "Created a forum post."
-        type = "forum_post"
-      end
-      
-      Achievements.award_achievement(char, type, 'community', message)
-    end
-    
     def self.is_category_hidden?(char, category)
       return false if !char
       prefs = Forum.get_forum_prefs(char, category)
@@ -232,11 +249,19 @@ module AresMUSH
         :category => category.name, 
         :reference => post.reference_str,
         :author => enactor.name)
+        
+      data = {
+        category: category.id,
+        post: post.id,
+        author: {name: enactor.name, icon: Website.icon_for_char(enactor), id: enactor.id},
+        subject: post.subject,
+        message: Website.format_markdown_for_html(message),
+        raw_message: message,
+        type: 'forum_edited'
+      }
       
-      Global.notifier.notify_ooc(:forum_edited, notification) do |char|
-        Forum.can_read_category?(char, category)
-      end
-      
+      Forum.add_recent_post(post)
+      Forum.notify(post, category, :forum_edited, notification, data)
       Forum.mark_read_for_player(enactor, post)
     end
     
@@ -250,10 +275,19 @@ module AresMUSH
         :reference => post.reference_str,
         :author => enactor.name)
       
-      Global.notifier.notify_ooc(:forum_edited, notification) do |char|
-        Forum.can_read_category?(char, category)
-      end
+      data = {
+        category: category.id,
+        post: post.id,
+        reply: reply.id,
+        subject: post.subject,
+        author: {name: enactor.name, icon: Website.icon_for_char(enactor), id: enactor.id},
+        message: Website.format_markdown_for_html(message),
+        raw_message: message,
+        type: 'reply_edited'
+      }
       
+      Forum.add_recent_post(post)
+      Forum.notify(post, category, :reply_edited, notification, data)
       Forum.mark_read_for_player(enactor, post)
     end
     
@@ -261,6 +295,16 @@ module AresMUSH
       category.unread_posts(enactor).each do |p|
         Forum.mark_read_for_player(enactor, p)
       end
+    end
+    
+    def self.add_recent_post(post)
+      recent = Game.master.recent_forum_posts
+      recent.unshift("#{post.id}")
+      recent = recent.uniq
+      if (recent.count > 100)
+        recent.pop
+      end
+      Game.master.update(recent_forum_posts: recent)
     end
   end
 end

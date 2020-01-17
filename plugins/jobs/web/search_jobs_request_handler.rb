@@ -12,9 +12,9 @@ module AresMUSH
         
         job_admin = Jobs.can_access_jobs?(enactor)
         if (job_admin)
-          jobs = Jobs.filtered_jobs(enactor, "ALL")
+          jobs = Jobs.accessible_jobs(enactor, nil, true)
         else
-          jobs = enactor.jobs.to_a
+          jobs = enactor.requests.to_a
         end
         
         if (!searchTitle.blank?)
@@ -26,7 +26,7 @@ module AresMUSH
         end
         
         if (!searchSubmitter.blank?)
-          jobs = jobs.select { |j| j.author && (j.author.name.upcase == searchSubmitter.upcase) }
+          jobs =  jobs.select { |j| Jobs.has_participant_by_name?(j, searchSubmitter) }
         end
                 
         

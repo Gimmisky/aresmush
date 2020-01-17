@@ -2,7 +2,6 @@
 login:
   allow_web_registration: true
   guest_role: guest
-  use_terms_of_service: true
   activity_cron:
     minute:
     - 0
@@ -14,6 +13,14 @@ login:
     - 3
     minute:
     - 0
+  notice_cleanup_cron:
+    day:
+    - 18
+    hour:
+    - 2
+    minute:
+    - 19
+  notice_timeout_days: 60
   shortcuts:
     logout: quit
     con: connect

@@ -14,6 +14,8 @@ module AresMUSH
     
     index :name_upcase
     
+    set :join_roles, "AresMUSH::Role"
+    set :talk_roles, "AresMUSH::Role"
     set :roles, "AresMUSH::Role"
     set :characters, "AresMUSH::Character"
 
@@ -46,7 +48,7 @@ module AresMUSH
     
     def add_to_history(msg)
       return if !self.recall_enabled
-      new_messages = (self.messages << { message: msg, timestamp: DateTime.now })
+      new_messages = (self.messages << { message: msg, timestamp: DateTime.now, id: SecureRandom.uuid })
       if (new_messages.count > Channels.recall_buffer_size)
         new_messages.shift
       end

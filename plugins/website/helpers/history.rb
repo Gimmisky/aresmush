@@ -1,46 +1,44 @@
 module AresMUSH
   module Website
-    def self.get_recent_changes(unique_only = false, limit = 50)
-      
-      recent_profiles = ProfileVersion.all
-         .to_a
-         .sort_by { |p| p.created_at }
-         .reverse[0..50]
-         .uniq { |p| p.character }
-
-      recent_wiki = WikiPageVersion.all
-         .to_a
-         .sort_by { |p| p.created_at }
-         .reverse[0..50]
-         .uniq { |w| w.wiki_page }
-
-      recent_changes = []
-      recent_profiles.each do |p|
-        recent_changes << {
-          title: p.character.name,
-          id: p.id,
-          change_type: 'char',
-          created_at: p.created_at,
-          created: OOCTime.local_long_timestr(nil, p.created_at),
-          name: p.character.name,
-          author: p.author_name
-        }
+    def self.add_to_recent_changes(type, message, data, author_name)
+      changes = Game.master.recent_changes || []
+      change_data = { 'type' => type, 
+        'data' => data, 
+        'message' => message, 
+        'author' => author_name, 
+        'timestamp' => Time.now 
+      }
+      changes.unshift(change_data)
+      if (changes.count > 99)
+        changes.pop
       end
-      recent_wiki.each do |w|
-        recent_changes << {
-          title: w.wiki_page.heading,
-          id: w.id,
-          change_type: 'wiki',
-          created_at: w.created_at,
-          created: OOCTime.local_long_timestr(nil, w.created_at),
-          name: w.wiki_page.name,
-          author: w.author_name
-        }
-      end
-        
-      recent_changes = recent_changes.sort_by { |r| r[:created_at] }.reverse
-      recent_changes[0..limit]
-    end 
+      Game.master.update(recent_changes: changes)
+    end
     
+    def self.recent_changes(viewer, unique_only = false, limit = 50)
+      all_changes = Game.master.recent_changes || []
+      changes = []
+      
+      if (unique_only)
+        found = []
+        all_changes.each do |c|
+          key = "#{c['message']}#{c['type']}"
+          if (!found.include?(key))
+            found << key
+            changes << c
+          end
+        end
+      else
+        changes = all_changes
+      end
+      
+      changes[0..limit].map { |c| {
+        type: c['type'],
+        message: c['message'],
+        data: c['data'],
+        timestamp: OOCTime.local_long_timestr(viewer, c['timestamp']),
+        author: c['author']
+      } }
+    end
   end
 end

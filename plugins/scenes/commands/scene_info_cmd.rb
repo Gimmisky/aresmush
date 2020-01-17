@@ -38,9 +38,6 @@ module AresMUSH
             
           when "icdate"
             success = set_icdate(scene)
-          
-          when "plot"
-            success = set_plot(scene)
             
           when "title"
             scene.update(title: self.value)
@@ -93,22 +90,6 @@ module AresMUSH
         return true
       end
 
-      def set_plot(scene)
-        plot_num = self.value.to_i
-        plot = Plot[plot_num]
-        if (!plot)
-          plot = Plot.all.first { |p| p.title.upcase == self.value.upcase }
-        end
-        
-        if (!plot)
-          client.emit_failure t('scenes.invalid_plot')
-          return false
-        end
-        
-        scene.update(plot: plot)
-        return true
-      end
-
       def set_icdate(scene)
         if (self.value !~ /\d\d\d\d-\d\d-\d\d/)
           client.emit_failure t('scenes.invalid_icdate_format')
@@ -119,6 +100,11 @@ module AresMUSH
       end
       
       def set_location(scene)
+        if (scene.completed)
+          client.emit_failure t('scenes.scene_already_completed')
+          return false
+        end
+
         Scenes.set_scene_location(scene, self.value, enactor)
         
         if (scene.room && !scene.temp_room)

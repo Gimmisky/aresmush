@@ -9,13 +9,15 @@ module AresMUSH
     def self.shortcuts
       Global.read_config("fs3skills", "shortcuts")
     end
+
+    def self.achievements
+      Global.read_config('fs3skills', 'achievements')
+    end
  
     def self.get_cmd_handler(client, cmd, enactor)
       case cmd.root
       when "abilities"
         return AbilitiesCmd
-      when "backup"
-        return CharBackupCmd
       when "specialty"
         if (cmd.switch_is?("add"))
           return AddSpecialtyCmd
@@ -68,6 +70,8 @@ module AresMUSH
       case event_name
       when "CronEvent"
         return XpCronHandler
+      when "CharIdledOutEvent"
+        return CharIdledOutEventHandler
       end
       
       nil
@@ -77,10 +81,14 @@ module AresMUSH
       case request.cmd
       when "abilities"
         return AbilitiesRequestHandler
+      when "addJobRoll"
+        return AddJobRollRequestHandler
       when "addSceneRoll"
         return AddSceneRollRequestHandler
       when "learnAbility"
         return LearnAbilityRequestHandler
+      when"spendLuck"
+        return SpendLuckRequestHandler
       end
       nil
     end

@@ -29,7 +29,9 @@ module AresMUSH
         @event_client = double
         allow(@event_char).to receive(:name) { "Bob" }
         allow(@event_char).to receive(:room) { nil }    
-
+        allow(@event_char).to receive(:is_guest?) { false }
+        allow(@event_client).to receive(:ip_addr) { "IP" }
+        allow(@event_client).to receive(:hostname) { "HOST" }
         @event_char_id = 111
         allow(Character).to receive(:[]).with(@event_char_id) { @event_char }
       end
@@ -48,7 +50,7 @@ module AresMUSH
         end
         
         it "should update the site info" do
-          expect(Login).to receive(:update_site_info).with(@event_client, @event_char) {}
+          expect(Login).to receive(:update_site_info).with("IP", "HOST", @event_char) {}
           @login_events.on_event CharConnectedEvent.new(@event_client, @event_char_id)
         end
         
@@ -81,6 +83,12 @@ module AresMUSH
           @login_events.on_event CharCreatedEvent.new(@event_client, @event_char_id)
         end
         
+        it "should not show events for a guest" do
+          expect(@event_char).to receive(:is_guest?) { true }
+          expect(dispatcher).to_not receive(:queue_timer)
+          @login_events.on_event CharCreatedEvent.new(@event_client, @event_char_id)
+        end
+        
       end
       
       describe :on_char_created_event do
@@ -91,7 +99,7 @@ module AresMUSH
         end
         
         it "should announce the char" do
-          expect(notifier).to receive(:notify_ooc).with(:char_created, "announce_char_created")
+          expect(Channels).to receive(:announce_notification).with("announce_char_created")
           @login_events.on_event CharCreatedEvent.new(@event_client, @event_char_id)
         end
       end

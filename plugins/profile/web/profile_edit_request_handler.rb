@@ -24,7 +24,7 @@ module AresMUSH
         profile = {}
         relationships = {}
         
-        Global.read_config('demographics')['editable_properties'].sort.each do |d| 
+        Global.read_config('demographics')['editable_properties'].each do |d| 
           demographics[d.downcase] = 
             {
               name: d.titlecase,
@@ -40,11 +40,14 @@ module AresMUSH
           }
         }
         
-        relationships = char.relationships.sort.each_with_index.map { |(name, data), index| {
+        relationships = char.relationships.sort_by { |name, data| [ data['category'], data['order'] || 99, name ] }
+          .each_with_index.map { |(name, data), index| {
           name: name,
           category: data['category'],
           key: index,
           order: data['order'],
+          is_npc: data['is_npc'],
+          npc_image: data['npc_image'],
           text: Website.format_input_for_html(data['relationship'])
         }}
         
@@ -54,15 +57,15 @@ module AresMUSH
         {
           id: char.id,
           name: char.name,
-          fullname: char.demographic(:fullname),
           demographics: demographics,
           background: Website.format_input_for_html(char.background),
           rp_hooks: Website.format_input_for_html(char.rp_hooks),
           desc: Website.format_input_for_html(char.description),
           shortdesc: char.shortdesc ? char.shortdesc : '',
           relationships: relationships,
+          relationships_category_order: char.relationships_category_order.join(","),
           profile: profile,
-          gallery: (char.profile_gallery || {}).map { |f| Website.get_file_info(f) },
+          profile_gallery: (char.profile_gallery || []).join(' '),
           tags: char.profile_tags,
           files: files, 
           profile_image: char.profile_image ? Website.get_file_info(char.profile_image) : nil,

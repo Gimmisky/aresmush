@@ -6,7 +6,7 @@ module AresMUSH
     end
     
     def self.category_order(char, category)
-      char.relationships_category_order.index(category) || (category[0] || "1").ord
+      char.relationships_category_order.map { |r| r.upcase }.index(category.upcase) || (category[0] || "1").ord
     end
     
     def self.can_manage_char_profile?(actor, char)
@@ -23,7 +23,7 @@ module AresMUSH
     
     def self.character_page_files(char)
       name = Profile.character_page_folder(char)
-      Dir[File.join(AresMUSH.website_uploads_path, "#{name}/**")]
+      Dir[File.join(AresMUSH.website_uploads_path, "#{name}/**")].sort
     end
     
     def self.get_profile_status_message(char)

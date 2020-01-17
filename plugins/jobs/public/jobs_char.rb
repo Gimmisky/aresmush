@@ -2,9 +2,12 @@ module AresMUSH
   class Character
     
     attribute :jobs_filter, :default => "ACTIVE"
+    
     attribute :read_jobs, :type => DataType::Array, :default => []
 
     collection :jobs, "AresMUSH::Job", :author
+    
+    before_delete :delete_job_participation
     
     def has_unread_jobs?
       !unread_jobs.empty?
@@ -20,14 +23,25 @@ module AresMUSH
     
     def unread_jobs
       return [] if !Jobs.can_access_jobs?(self)
-      staff_jobs = Job.all.select { |j| !Jobs.check_job_access(self, j) && j.is_unread?(self) }
+      read_jobs = self.read_jobs || []
+      staff_jobs = Jobs.accessible_jobs(self).select { |j| !read_jobs.include?(j.id) }
       their_jobs = self.unread_requests
       
       return staff_jobs.concat(their_jobs).uniq
     end
     
     def unread_requests
-      self.jobs.select { |r| r.is_unread?(self) }
+      self.requests.select { |r| r.is_unread?(self) }
+    end
+    
+    def requests
+      self.jobs.to_a.concat(Job.all.select { |j| j.participants.include?(self) })
+    end
+    
+    def delete_job_participation
+      Job.all.each do |j|
+        Database.remove_from_set j.participants, self
+      end
     end
   end
 end

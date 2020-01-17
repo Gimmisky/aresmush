@@ -14,15 +14,13 @@ module AresMUSH
       end
             
       def handle
-        place = Places.find_place(enactor, self.name)
+        place = Places.find_place(enactor_room, self.name)
       
         if (!place)
-          client.emit_failure t('places.place_doesnt_exist')
-          return
+          place = Place.create(name: self.name, room: enactor_room)
         end
         
-        enactor.update(place: place)
-        enactor_room.emit_ooc t('places.place_joined', :name => enactor.name, :place_name => place.name)
+        Places.join_place(enactor, place)
       end
     end
   end

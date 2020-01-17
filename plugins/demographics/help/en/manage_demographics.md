@@ -1,12 +1,14 @@
 ---
 toc: ~admin~ Managing the Game
 summary: Managing character demographics.
+aliases:
+- manage_groups
 ---
 # Managing Demographics
 
 > **Permission Required:** These commands require the Admin role or the permission: manage\_demographics
 
-You can set any of the basic character demographics (fullname, gender, etc.) on another character.
+You can set any of the basic character demographics (full name, gender, etc.) on another character.
 
 `demographic <name>=<field>/<value>`
 
@@ -15,12 +17,6 @@ You can set any of the basic character demographics (fullname, gender, etc.) on 
 Use the special birthday command to set someone else's age or birthdate.
 
 `birthdate <name>=<birthdate>`
-
-## Setting Actor
-
-Use the special actor command to set someone else's actor.
-
-`actor <name>=<actor name>`
 
 ## Setting Groups
 

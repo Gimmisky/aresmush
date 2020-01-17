@@ -10,17 +10,23 @@ module AresMUSH
     def self.shortcuts
       Global.read_config("scenes", "shortcuts")
     end
- 
+    
+    def self.achievements
+      list = Global.read_config("scenes", "achievements") || {}
+      
+      # Automatically add achievements for the various scene types.
+      Scenes.scene_types.each do |type|
+        list["scene_participant_#{type.downcase}"] = { 'type' => 'story', 'message' => "Participated in a #{type} scene." }
+      end
+      list
+    end
+    
     def self.get_cmd_handler(client, cmd, enactor)
       case cmd.root
       when "autospace"
         return AutospaceCmd
       when "nospoof"
         return NospoofCmd
-      when "pemit"
-        return PemitCmd
-      when "whisper"
-        return WhisperCmd
       when "ooc"
         # ooc by itself is an alias for offstage
         if (cmd.args)
@@ -58,7 +64,7 @@ module AresMUSH
       
       when "scene"
         case cmd.switch
-        when "all"
+        when "all", "open"
           return ScenesCmd
         when nil
           if (cmd.args)
@@ -94,12 +100,16 @@ module AresMUSH
           return SceneStopCmd
         when "types"
           return SceneTypesCmd
-        when "log", "repose"
+        when "log"
           return SceneLogCmd
         when "clearlog"
           return SceneLogClearCmd
         when "enablelog", "disablelog"
           return SceneLogEnableCmd
+        when "repose"
+          return SceneReposeCmd
+        when "report"
+          return SceneReportCmd
         when "share"
           return SceneShareCmd
         when "unshare"
@@ -157,6 +167,8 @@ module AresMUSH
         return DeleteSceneRequestHandler
       when "downloadScene"
         return DownloadSceneRequestHandler
+      when "dropPoseOrder"
+        return DropPoseOrderRequestHandler
       when "editPlot"
         return EditPlotRequestHandler
       when "editScene"
@@ -179,6 +191,8 @@ module AresMUSH
         return PlotRequestHandler
       when "recentScenes"
         return RecentScenesRequestHandler
+      when "reportScene"
+        return ReportSceneRequestHandler
       when "scene"
         return GetSceneRequestHandler
       when "scenes"
@@ -189,6 +203,8 @@ module AresMUSH
         return GetSceneTypesRequestHandler
       when "searchScenes"
         return SearchScenesRequestHandler
+      when "switchPoseOrder"
+        return SwitchPoseOrderRequestHandler
       when "unwatchScene"
         return UnwatchSceneRequestHandler
       when "watchScene"

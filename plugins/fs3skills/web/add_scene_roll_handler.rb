@@ -2,9 +2,8 @@ module AresMUSH
   module FS3Skills
     class AddSceneRollRequestHandler
       def handle(request)
-        scene = Scene[request.args[:scene_id]]
+        scene = Scene[request.args[:id]]
         enactor = request.enactor
-        roll_str = request.args[:roll_string]
         
         if (!scene)
           return { error: t('webportal.not_found') }
@@ -21,21 +20,11 @@ module AresMUSH
           return { error: t('scenes.scene_already_completed') }
         end
         
-        roll = FS3Skills.parse_and_roll(enactor, roll_str)
-        roll_result = FS3Skills.get_success_level(roll)
-        success_title = FS3Skills.get_success_title(roll_result)
-        message = t('fs3skills.simple_roll_result', 
-          :name => enactor.name,
-          :roll => roll_str,
-          :dice => FS3Skills.print_dice(roll),
-          :success => success_title
-        )
+        result = FS3Skills.determine_web_roll_result(request, enactor)
         
-        Scenes.add_to_scene(scene, message, Game.master.system_character)
-        
-        if (scene.room)
-          scene.room.emit message
-        end
+        return result if result[:error]
+
+        FS3Skills.emit_results(result[:message], nil, scene.room, false)
         
         {
         }

@@ -18,7 +18,7 @@ module AresMUSH
       end
       
       def category_color(job)
-        Jobs.category_color(job.category)
+        Jobs.category_color(job.job_category.name)
       end
      
       def handler(job)
@@ -31,10 +31,6 @@ module AresMUSH
       
       def unread_status(job)
         job.is_unread?(@char) ? t('jobs.unread_marker') : ""
-      end
-      
-      def reboot_text
-        Jobs.reboot_required_notice
       end
       
       def jobs_footer

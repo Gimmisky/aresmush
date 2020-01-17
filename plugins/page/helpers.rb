@@ -13,7 +13,11 @@ module AresMUSH
       recipients.sort_by { |r| r.name }.each do |r|
         client = Login.find_client(r)
         if (!client)
-          names << "#{r.name}<#{t('page.offline_status')}>"
+          if (Login.find_web_client(r))
+            names << "#{r.name}#{Website.web_char_marker}"
+          else
+            names << "#{r.name}<#{t('page.offline_status')}>"
+          end
         elsif (r.page_do_not_disturb)
           names << "#{r.name}<#{t('page.dnd_status')}>"
         elsif (r.is_afk?)
@@ -96,7 +100,13 @@ module AresMUSH
         #  Page.send_afk_message(client, recipient_client, recipient)
         #end
       end
-            
+
+      everyone.each do |char| 
+        next if char == enactor   
+        Login.notify(char, :pm, t('page.new_pm', :thread => thread.title_without_viewer(char)), thread.id, "", false)
+      end
+      
+      # Can't use notify_web_clients here because the notification is different for each person.
       Global.dispatcher.spawn("Page notification", nil) do
         everyone.each do |char|    
           title = thread.title_without_viewer(char)
@@ -150,6 +160,16 @@ module AresMUSH
     def self.has_unread_page_threads?(char)
       return false if !char
       char.page_threads.any? { |t| Page.is_thread_unread?(t, char) }
+    end
+    
+    def self.report_page_abuse(enactor, thread, messages, reason)
+      log = messages.map { |m| "  [#{OOCTime.local_long_timestr(enactor, m.created_at)}] #{m.message}"}.join("%R")
+      
+      body = t('page.page_reported_body', :name => thread.title_without_viewer(enactor), :reporter => enactor.name)
+      body << reason
+      body << "%R"
+      body << log
+      Jobs.create_job(Jobs.trouble_category, t('page.page_reported_title'), body, Game.master.system_character)
     end
   end
 

@@ -62,7 +62,7 @@ module AresMUSH
       chars = channel.characters.sort_by(:name_upcase, :order => "ALPHA")
       online_chars = []
       chars.each do |c|
-        next if !Login.is_online?(c)
+        next if !Login.is_online_or_on_web?(c)
         online_chars << c
       end
       online_chars
@@ -89,16 +89,15 @@ module AresMUSH
     end
     
     def self.pose_to_channel(channel, name, msg, title)
-      if (msg.start_with?("\\"))
-        msg = msg.gsub(/\\+/, '')
-      end
       formatted_msg = PoseFormatter.format(name, msg)
       Channels.emit_to_channel channel, formatted_msg, title
       return formatted_msg
     end
     
-    def self.mute_text(char, channel)
-      Channels.is_muted?(char, channel) ? "%xh%xx#{t('channels.muted')}%xn" : ""
+    def self.channel_who_status(char, channel)
+      web_marker = Login.is_portal_only?(char) ? "%xh%xx#{Website.web_char_marker}%xn" : ""
+      mute_marker = Channels.is_muted?(char, channel) ? "%xh%xx#{t('channels.muted')}%xn" : ""
+      "#{web_marker}#{mute_marker}"
     end
     
     def self.leave_channel(char, channel)
@@ -122,10 +121,16 @@ module AresMUSH
       return nil
     end
     
-    def self.can_use_channel(char, channel)
-      return true if channel.roles.empty?
+    def self.can_join_channel?(char, channel)
+      return true if channel.join_roles.empty?
       return true if Channels.can_manage_channels?(char)
-      return char.has_any_role?(channel.roles)
+      return char.has_any_role?(channel.join_roles)
+    end
+    
+    def self.can_talk_on_channel?(char, channel)
+      return true if channel.talk_roles.empty?
+      return true if Channels.can_manage_channels?(char)
+      return char.has_any_role?(channel.talk_roles)
     end
     
     def self.with_an_enabled_channel(name, client, enactor, &block)
@@ -226,7 +231,7 @@ module AresMUSH
           return t('channels.already_on_channel')
         end
         
-        if (!Channels.can_use_channel(char, channel))
+        if (!Channels.can_join_channel?(char, channel))
           return t('channels.cant_use_channel')
         end
         
@@ -252,6 +257,17 @@ module AresMUSH
     
     def self.active_channels(char)
       char.channels.select { |c| !Channels.is_muted?(char, c) }
+    end
+    
+    def self.report_channel_abuse(enactor, channel, messages, reason) 
+      messages = messages.map { |m| "  [#{OOCTime.local_long_timestr(enactor, m['timestamp'])}] #{channel.display_name} #{m['message']}"}.join("%R")
+
+      body = t('channels.channel_reported_body', :name => channel.name, :reporter => enactor.name)
+      body << reason
+      body << "%R-------%R"
+      body << messages
+
+      Jobs.create_job(Jobs.trouble_category, t('channels.channel_reported_title'), body, Game.master.system_character)
     end
   end
 end

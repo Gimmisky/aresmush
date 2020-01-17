@@ -4,9 +4,8 @@ summary: Using luck points.
 ---
 # FS3 - Luck
 
-Luck Points in FS3 can be used to generate various lucky breaks.  Luck points are earned through cookies (see [Cookies](/help/cookies)).  You can view your available luck points on your character sheet.
+Luck Points in FS3 can be used to generate various lucky breaks.  
 
-You can use luck points for combat, ability rolls, or other plot points at the storyteller's discretion.  See [FS3 Player's Guide](http://aresmush.com/fs3/fs3-3/luck.html) for more information.
+> Learn how the FS3 skills system works in the [FS3 Tutorial](/help/fs3).
 
-`luck/spend <reason>` - Spends luck outside of combat.
-    See [Combat Luck](/help/combat) for combat-related luck commands.
+`luck/spend <reason>` - Spends luck outside of combat. See [Combat Luck](/help/combat) for combat-related luck commands.

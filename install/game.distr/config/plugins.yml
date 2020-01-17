@@ -10,9 +10,9 @@ plugins:
   optional_plugins:
   - achievements
   - chargen
-  - cookies
   - events
   - fs3combat
   - fs3skills
   - ranks
   - weather
+  extras: []

@@ -37,26 +37,27 @@ source "${HOME_DIR}/.rvm/scripts/rvm"
 
 echo -e "${ARES_INSTALL_TEXT} Install Ruby version."
 
-rvm install ruby-2.6.0
+rvm install ruby-2.6.3
 
 # #########################################################################################
 
 echo -e "${ARES_INSTALL_TEXT} Use Ruby version."
 
-rvm use ruby-2.6.0
+rvm use ruby-2.6.3
 
 # #########################################################################################
 
 echo -e "${ARES_INSTALL_TEXT} Ensure proper Ruby version used at startup."
 
 echo "source /home/ares/.rvm/scripts/rvm" >> "${HOME_DIR}/.profile"
-echo "rvm use 2.6.0" >> "${HOME_DIR}/.profile"
+echo "rvm use 2.6.3" >> "${HOME_DIR}/.profile"
 
 # #########################################################################################
 
 echo -e "${ARES_INSTALL_TEXT} Install gem bundler for dependencies."
 
 gem install bundler
+gem install rake
 
 # #########################################################################################
 
@@ -129,11 +130,12 @@ chmod +x bin/*
 
 echo -e "${ARES_INSTALL_TEXT} Installing Node for Ember."
 
+sudo npm install -g npm
 curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.8/install.sh | bash
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
-nvm install 11.0.0
-nvm use 11.0.0
+nvm install 12
+nvm use 12
 
 # #########################################################################################
 

@@ -5,11 +5,8 @@ module AresMUSH
         scene = Scene[request.args[:id]]
         enactor = request.enactor
         pose = (request.args[:pose] || "").chomp
+        pose_char = request.args[:pose_char]
         pose_type = request.args[:pose_type]
-        is_setpose = pose_type == 'setpose'
-        is_gmpose = pose_type == 'gm'
-        is_ooc = pose_type == 'ooc'
-        is_emit = pose_type == 'emit'
         
         if (!scene)
           return { error: t('webportal.not_found') }
@@ -29,37 +26,26 @@ module AresMUSH
         if (!scene.room)
           raise "Trying to pose to a scene that doesn't have a room."
         end
-        
-        Global.logger.debug "Scene #{scene.id} pose added by #{enactor.name}."
-        
-        pose = Website.format_input_for_mush(pose)
-        
-        command = ((pose.split(" ").first) || "").downcase
-        if (command == "ooc")
-          is_ooc = true
-          pose = pose.after(" ")
-          pose = PoseFormatter.format(enactor.name, pose)
-        elsif (command == "scene/set" || command == "emit/set") 
-          is_setpose = true
-          pose = pose.after(" ")
-        elsif (command == "emit/gm")
-          is_gmpose = true
-          pose = pose.after(" ")
-        elsif (command == "emit")
-          pose = pose.after(" ")
-        else
-          markers = PoseFormatter.pose_markers
-          markers.delete "\""
-          markers.delete "'"
-          if (pose.start_with?(*markers) || is_ooc)
-            pose = PoseFormatter.format(enactor.name, pose)
-          end
+
+        char = pose_char ? Character[pose_char] : enactor
+
+        if (!char)
+          return { error: t('webportal.not_found') }
         end
         
-        Scenes.emit_pose(enactor, pose, is_emit, is_ooc, nil, is_setpose || is_gmpose, scene.room)
+        if !Scenes.can_pose_char?(enactor, char)
+          return { error: t('dispatcher.not_allowed') }
+        end
+                  
+        pose = Website.format_input_for_mush(pose)
         
-        if (is_setpose && scene.room)
-          scene.room.update(scene_set: pose)
+        parse_results = Scenes.parse_web_pose(pose, char, pose_type)
+        
+        Scenes.emit_pose(char, parse_results[:pose], parse_results[:is_emit], 
+           parse_results[:is_ooc], nil, parse_results[:is_setpose] || parse_results[:is_gmpose], scene.room)
+        
+        if (parse_results[:is_setpose] && scene.room)
+          scene.room.update(scene_set: parse_results[:pose])
         end
         
         {}

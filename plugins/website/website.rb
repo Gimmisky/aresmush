@@ -12,7 +12,11 @@ module AresMUSH
     def self.shortcuts
       {}
     end
- 
+    
+    def self.achievements
+      Global.read_config('website', 'achievements')
+    end
+    
     def self.init_plugin
       Website.rebuild_css
     end
@@ -46,6 +50,8 @@ module AresMUSH
       case request.cmd
         
       ## WIKI
+      when "blankWiki"
+        return GetBlankWikiPageRequestHandler
       when "createWiki"
         return CreateWikiPageRequestHandler
       when "deleteWiki"

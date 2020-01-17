@@ -16,9 +16,12 @@ module AresMUSH
         before do 
           specials = {
             "Helmet" => { "defense" => 2, "protection" => { "Head" => 2 } },
-            "Cup" => { "protection" => { "Groin" => 2 } } }
+            "Cup" => { "protection" => { "Groin" => 2 } },
+            "Defenseless" => { "protection" => { "Chest" => 2 } }  
+          }
+          armor = { "defense" => 1, "protection" => { "Head" => 1, "Body" => 4 } }
           allow(FS3Combat).to receive(:armor_specials) { specials }
-          allow(FS3Combat).to receive(:armor).with("Military") { { "defense" => 1, "protection" => { "Head" => 1, "Body" => 4 } } }
+          allow(FS3Combat).to receive(:armor).with("Military") { armor }
         end
         
         it "should return nil if armor not found" do
@@ -26,11 +29,22 @@ module AresMUSH
           expect(FS3Combat.armor_stat("Police", "protection")).to be_nil
         end
         
+        it "should return nil if no stat" do
+          expect(FS3Combat.armor_stat("Military", "foo")).to be_nil
+        end
+        
         it "should add special protection together" do
           protection = FS3Combat.armor_stat("Military+Helmet+Cup", "protection")
           expect(protection['Head']).to eq 3
           expect(protection['Body']).to eq 4
           expect(protection['Groin']).to eq 2
+        end
+        
+        it "should not affect the underlying protection values in the config" do
+          protection = FS3Combat.armor_stat("Military+Helmet+Cup", "protection")
+          expect(protection['Head']).to eq 3
+          protection = FS3Combat.armor_stat("Military", "protection")
+          expect(protection['Head']).to eq 1
         end
         
         it "should add other stats" do
@@ -123,6 +137,8 @@ module AresMUSH
           allow(@combatant).to receive(:action=)
           allow(@combatant).to receive(:weapon)
           allow(@combatant).to receive(:weapon_specials)
+          allow(@combatant).to receive(:prior_ammo) { nil }
+          allow(@combatant).to receive(:weapon_name) { nil }
         end
 
         it "should pretty up the weapon and specials if set" do
@@ -155,6 +171,32 @@ module AresMUSH
           expect(FS3Combat).to receive(:emit_to_combat).with(@combat, "fs3combat.weapon_changed", "npcmaster")
           FS3Combat.set_weapon(@enactor, @combatant, "rifle", [ "s1", "s2" ])
         end
+        
+        it "should set ammo to previous used ammo if there is one" do
+          expect(FS3Combat).to receive(:weapon_stat).with("rifle", "ammo") { 22 }
+          expect(@combatant).to receive(:prior_ammo) { { "Rifle" => 17 } }
+          expect(@combatant).to receive(:update).with(ammo: 17)
+          FS3Combat.set_weapon(@enactor, @combatant, "rifle", nil)
+        end
+
+        it "should set ammo to max ammo if there isn't one" do
+          expect(FS3Combat).to receive(:weapon_stat).with("rifle", "ammo") { 22 }
+          expect(@combatant).to receive(:prior_ammo) { { "Pistol" => 7 } }
+          expect(@combatant).to receive(:update).with(ammo: 22)
+          FS3Combat.set_weapon(@enactor, @combatant, "rifle", nil)
+        end
+        
+        it "should save their prior ammo" do
+          expect(FS3Combat).to receive(:weapon_stat).with("rifle", "ammo") { 22 }
+          expect(@combatant).to receive(:weapon_name) { "Pistol" }.twice
+          expect(@combatant).to receive(:ammo) { 7 }
+          expect(@combatant).to receive(:prior_ammo) { { "KEW" => 77 } }
+          expect(@combatant).to receive(:update).with(ammo: 22)
+          expect(@combatant).to receive(:update).with(max_ammo: 22)
+          expect(@combatant).to receive(:update).with(prior_ammo: { "KEW" => 77, "Pistol" => 7 })
+          FS3Combat.set_weapon(@enactor, @combatant, "rifle", nil)
+        end
+        
       end
     end
   end

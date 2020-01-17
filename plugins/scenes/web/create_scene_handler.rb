@@ -5,7 +5,8 @@ module AresMUSH
         enactor = request.enactor
         plot = request.args[:plot_id]
         completed = (request.args[:completed] || "").to_bool
-        privacy = request.args[:privacy]
+        privacy = request.args[:privacy] || "Private"
+        log = request.args[:log] || ""
         
         error = Website.check_login(request)
         return error if error
@@ -24,13 +25,14 @@ module AresMUSH
         
         scene = Scene.create(
         location: request.args[:location],
-        summary: request.args[:summary],
+        summary: Website.format_input_for_mush(request.args[:summary]),
+        content_warning: request.args[:content_warning],
+        last_activity: Time.now,
         scene_type: request.args[:scene_type],
         title: request.args[:title],
         icdate: request.args[:icdate],
-        shared: completed,
-        date_shared: completed ? Time.now : nil,
         completed: completed,
+        date_completed: completed ? Time.now : nil,
         plot: plot.blank? ? nil : Plot[plot],
         private_scene: completed ? false : (privacy == "Private"),
         owner: enactor
@@ -39,11 +41,12 @@ module AresMUSH
         Global.logger.debug "Web scene #{scene.id} created by #{enactor.name}."
             
         participant_names = request.args[:participants] || []
-      
+        participants = []
         participant_names.each do |p|
           participant = Character.find_one_by_name(p.strip)
           if (participant)
-            Scenes.add_participant(scene, participant)
+            Scenes.add_participant(scene, participant, enactor)
+            participants << participant
           end
         end
       
@@ -60,13 +63,19 @@ module AresMUSH
         tags = (request.args[:tags] || []).map { |t| t.downcase }.select { |t| !t.blank? }
         scene.update(tags: tags)
       
+        if (!log.blank?)
+          Scenes.add_to_scene(scene, log, enactor)
+        end
+        
         if (completed)
-          log = SceneLog.create(scene: scene, log: request.args[:log])
-          scene.update(scene_log: log)
+          Scenes.share_scene(scene)
           
-          scene.participants.each do |char|
-            Scenes.handle_scene_participation_achievement(char)
+          participants.each do |p|
+            split_log = log.split
+            split_log = split_log[0..split_log.count/participants.count].join(" ")
+            Scenes.handle_word_count_achievements(p, split_log)
           end
+          
         else
           Scenes.create_scene_temproom(scene)
         end

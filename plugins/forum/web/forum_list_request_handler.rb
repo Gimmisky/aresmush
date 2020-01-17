@@ -15,7 +15,7 @@ module AresMUSH
              name: b.name,
              description: b.description,
              unread: enactor && b.has_unread?(enactor),
-             last_post: get_last_post(b, enactor)
+             last_activity: last_activity(b, enactor)
            }}
            
        hidden =Forum.hidden_categories(enactor)
@@ -24,6 +24,7 @@ module AresMUSH
              name: b.name   
           }}
         
+          
           {
             categories: categories,
             hidden: hidden,
@@ -31,15 +32,33 @@ module AresMUSH
           }
       end
       
-      def get_last_post(board, enactor)
-        last_post = board.last_post
-        return nil if !last_post
+      def last_activity(board, enactor)
+        
+        last_post = board.last_post_with_activity
+        if (!last_post)
+          return nil
+        end
+        
+        replies = last_post.sorted_replies
+        if (replies.empty?)
+          post = last_post
+          type = 'post'
+          author_name = last_post.author_name
+          date = last_post.created_at
+        else
+          post = last_post
+          type = 'reply'
+          author_name = replies[-1].author_name
+          date = replies[-1].created_at
+        end
+        
         
         {
-          id: last_post.id,
-          subject: last_post.subject,
-          author: last_post.author_name,
-          date: last_post.created_date_str(enactor)
+          id: post.id,
+          subject: post.subject,
+          author: author_name,
+          type: type,
+          date: OOCTime.local_long_timestr(enactor, date)
         }
       end
     end

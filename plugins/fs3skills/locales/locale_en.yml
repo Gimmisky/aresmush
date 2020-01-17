@@ -2,7 +2,7 @@ en:
     fs3skills:
         
         # Attribute / Action Skill Ratings
-        unskilled_rating: "Unskilled"
+        incapable_rating: "Incapable"
         poor_rating: "Poor"
         average_rating: "Average"
         good_rating: "Good"
@@ -51,7 +51,7 @@ en:
         reset_attributes: "Setting attributes to default values."
         
         # Rolls
-        embarrassing_failure: "%xREmbarassing Failure%xn"
+        embarrassing_failure: "%xREmbarrassing Failure%xn"
         failure: "%xrFailure%xn"
         success: "%xgSuccess%xn"
         good_success: "%xh%xgGood Success%xn"
@@ -97,7 +97,7 @@ en:
         invalid_luck_points: "That is not a valid number of luck points."
         luck_awarded: "%{luck} luck points awarded to %{name} for %{reason}."
         luck_award_mail_subject: "Luck Points Awarded"
-        not_enough_points: "You don't have that many luck points."
+        not_enough_points: "You don't have any luck points."
         #luck_point_spent: 
         #    one: "%{name} spends a luck point!"
         #    other: "%{name} spends %{count} luck points!"
@@ -146,6 +146,7 @@ en:
         xp_raised_job: "%{name} raised %{ability} to %{rating} with XP."
         must_be_approved: "You must be approved before you can spend XP."
         xp_undone: "You undo %{name}'s XP spend on %{skill} and refund them 1XP."
-        skill_requires_training: "Note: %{name} requires special training to advance beyond Fair.  Make sure your XP expenditure is justified ICly.  If in doubt, contact staff."
         max_ability_points_reached: "You have reached the maximum number of points in that kind of ability."
         cant_learn_advantages_xp: "You can't raise advantages directly with XP.  Submit a request to staff."
+        
+        skill_census_title: "Skill Scan"

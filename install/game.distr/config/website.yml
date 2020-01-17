@@ -4,7 +4,8 @@ website:
   character_gallery_group: Faction
   character_gallery_subgroup: Position
   left_sidebar: false
-  max_upload_size_kb: 5000
+  max_upload_size_kb: 300
+  max_folder_size_kb: 2000
   restricted_pages:
   - home
   sitemap_update_cron:
@@ -15,59 +16,67 @@ website:
   top_navbar:
   - title: Play
     menu:
-    - page: chargen
-      title: Create a Character
-    - page: roster
-      title: Pre-Made Characters
+    - title: Create a Character
+      route: chargen
+    - title: Pre-Made Characters
+      route: roster
     - divider: true
-    - page: scenes-live
-      title: Active Scenes
-    - page: scenes-play
-      title: My Scenes
-    - page: scene-create
-      title: Start New Scene
+    - title: Active Scenes
+      route: scenes-live
+    - title: My Scenes
+      route: scenes-play
+    - title: Start New Scene
+      route: scene-create
     - divider: true
-    - page: who
-      title: Who's Online
-    - page: chat
-      title: Chat
-    - page: forum
-      title: Forum
+    - title: Who's Online
+      route: who
+    - title: Chat
+      route: chat
+    - title: Forum
+      route: forum
+    - title: Mail
+      route: mail
     - divider: true
-    - page: play
-      title: Play via Web Client
+    - title: Play via Web Client
+      route: play
   - title: Directory
     menu:
-    - page: characters
-      title: Characters
-    - page: scenes
-      title: Scenes
-    - page: plots
-      title: Plots
+    - title: Characters
+      route: characters
+    - title: Scenes
+      route: scenes
+    - title: Plots
+      route: plots
     - divider: true
-    - page: players
-      title: Players
-    - page: census
-      title: Census
-    - page: actors
-      title: Actors
-    - page: roster
-      title: Roster
-    - page: locations
-      title: Locations
-    - page: combats
-      title: Combats
+    - title: Players
+      route: players
+    - title: Game Admin
+      route: admins
+    - title: Census
+      route: census
+    - title: Roster
+      route: roster
+    - title: Locations
+      route: locations
+    - title: Combats
+      route: combats
     - divider: true
-    - page: files
-      title: Files
+    - title: Files
+      route: files
   - title: System
     menu:
-    - page: fs3skills-abilities
-      title: Abilities List
-    - page: fs3combat-gear
-      title: Gear List
-    - page: groups
-      title: Groups List
+    - title: Abilities List
+      route: fs3skills-abilities
+    - title: Gear List
+      route: fs3combat-gear
+    - title: Groups List
+      route: groups
+    - title: Achievements
+      route: achievements
+    - title: Skill Limits
+      route: fs3-limits
+    - title: XP Costs
+      route: fs3-xp-costs
     - divider: true
     - target: blank
       title: FS3 Player's Guide <i class="fa fa-external-link-alt" aria-hidden="true">
@@ -81,37 +90,41 @@ website:
       url: http://aresmush.com/fs3/fs3-3/combat-walkthrough.html
   - title: Wiki
     menu:
-    - page: wiki
-      title: Home
+    - title: Home
+      route: wiki
     - divider: true
-    - page: wiki-create
-      title: Create New Page
-    - page: wiki-all
-      title: All Pages
-    - page: search-wiki
-      title: Search Wiki
-    - page: wiki-tags
-      title: Tags
-    - page: recent-changes
-      title: Recent Changes
+    - title: Create New Page
+      route: wiki-create
+    - title: All Pages
+      route: wiki-all
+    - title: Search Wiki
+      route: search-wiki
+    - title: Tags
+      route: wiki-tags
+    - title: Recent Changes
+      route: recent-changes
     - divider: true
-    - page: files
-      title: Files
-    - page: help-topic
-      id: markdown
-      title: Markdown Reference
+    - title: Files
+      route: files
+    - id: markdown
+      title: Editing Help
+      route: help-topic
   - title: Help
     menu:
-    - page: jobs
-      title: Requests
+    - title: Requests
+      route: jobs
+    - title: Account
+      route: account
     - divider: true
-    - page: help
-      title: Game Help
-    - page: search-wiki
-      title: Search
-    - page: help-topic
-      id: markdown
+    - title: Game Help
+      route: help
+    - title: Search
+      route: search-wiki
+    - id: markdown
       title: Markdown Reference
+      route: help-topic
+    - title: Terms of Service
+      route: tos
     - divider: true
     - target: blank
       title: MUSH 101 Tutorial <i class="fa fa-external-link-alt" aria-hidden="true">
@@ -119,3 +132,10 @@ website:
   website_code_path: "/home/ares/ares-webportal"
   wiki_aliases:
     main: home
+  achievements:
+    wiki_create:
+      type: portal
+      message: Created a wiki page.
+    wiki_edit:
+      type: portal
+      message: Edited a wiki page.

@@ -61,14 +61,18 @@ module AresMUSH
       armor = FS3Combat.armor(name)
       return nil if !armor
       
-      value = armor[stat]
+      if (stat == "protection")
+        value = armor[stat].dup
+      else
+        value = armor[stat]
+      end
       return nil if !value
             
       # Special handling for protection because it's a hash itself
       special_names = name_with_specials.after("+")
       special_names = special_names ? special_names.split("+") : []
       specials = FS3Combat.armor_specials
-    
+      
       special_names.each do |s|
         special = specials[s]
         next if !special
@@ -149,9 +153,20 @@ module AresMUSH
     
     def self.set_weapon(enactor, combatant, weapon, specials = nil)
       max_ammo = weapon ? FS3Combat.weapon_stat(weapon, "ammo") : 0
-      combatant.update(weapon_name: weapon ? weapon.titlecase : "Unarmed")
+      weapon = weapon ? weapon.titlecase : "Unarmed"
+      prior_ammo = combatant.prior_ammo || {}
+      
+      current_ammo = max_ammo
+      if (weapon && prior_ammo[weapon] != nil)
+        current_ammo = prior_ammo[weapon]
+      end
+      if (combatant.weapon_name)
+        prior_ammo[combatant.weapon_name] = combatant.ammo
+        combatant.update(prior_ammo: prior_ammo)
+      end
+      combatant.update(weapon_name: weapon)
       combatant.update(weapon_specials: specials ? specials.map { |s| s.titlecase }.uniq : [])
-      combatant.update(ammo: max_ammo)
+      combatant.update(ammo: current_ammo)
       combatant.update(max_ammo: max_ammo)
       combatant.update(action_klass: nil)
       combatant.update(action_args: nil)
