@@ -10,14 +10,12 @@ module AresMUSH
       Global.read_config("custom", "shortcuts")
     end
 
-    def self.get_cmd_handler(client, cmd, enactor)
+def self.get_cmd_handler(client, cmd, enactor)
   case cmd.root
-  when "goals"
+  when "motivations"
     case cmd.switch
     when "set"
-      return SetGoalsCmd
-    else
-      return GoalsCmd
+      return SetMotivationsCmd
     end
   end
   return nil
