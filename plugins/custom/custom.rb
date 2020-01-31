@@ -11,7 +11,7 @@ module AresMUSH
     end
 
     def self.get_cmd_handler(client, cmd, enactor)
-    Global.logger.debug "GOT HERE!  #{cmd.inspect}"
+      Global.logger.debug "GOT HERE!  #{cmd.inspect}"
       case cmd.root
       when "motivations"
         case cmd.switch
