@@ -1,3 +1,5 @@
+$:.unshift File.dirname(__FILE__)
+
 module AresMUSH
   module Custom
     def self.plugin_dir
@@ -14,22 +16,10 @@ module AresMUSH
         case cmd.switch
         when "set"
           return SetMotivationsCmd
-        else
-          return MotivationsCmd
         end
       end
       return nil
     end
 
-    def self.get_cmd_handler(client, cmd, enactor)
-      case cmd.root
-      when "motivations"
-        case cmd.switch
-        when "set"
-          return SetMotivationsCmd
-        end
-      end
-      return nil
-    end
   end
 end
