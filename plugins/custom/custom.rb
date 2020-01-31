@@ -19,6 +19,6 @@ module AresMUSH
         end
       end
       return nil
-end
-end
+    end
+  end
 end
