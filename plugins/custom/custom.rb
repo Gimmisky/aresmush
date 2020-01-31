@@ -11,16 +11,16 @@ module AresMUSH
     end
 
     def self.get_cmd_handler(client, cmd, enactor)
-  case cmd.root
-  when "goals"
-    case cmd.switch
-    when "set"
-      return SetGoalsCmd
-    else
-      return GoalsCmd
+      Global.logger.debug "GOT HERE!  #{cmd.inspect}"
+      case cmd.root
+      when "motivations"
+        case cmd.switch
+        when "set"
+          return SetMotivationsCmd
+        end
+      end
+      return nil
     end
+
   end
-  return nil
-end
-end
 end
