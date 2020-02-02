@@ -2,41 +2,23 @@ module AresMUSH
   module Profile
     class CustomCharFields
       
-      # Return a hash of custom fields formatted for display
       # Note: Viewer may be nil if someone's looking at the character page without being logged in
-      # Example: return { goals: Website.format_markdown_for_html(char.goals) }
       def self.get_fields_for_viewing(char, viewer)
-        return { gift: Website.format_markdown_for_html(char.gift) }
-      end
-
-      def self.get_fields_for_viewing(char, viewer)
-        return { psyche: Website.format_markdown_for_html(char.psyche) }
-      end
-
-      # Return a hash of custom fields formatted for editing in the profile editor
-      # Example: return { goals: Website.format_input_for_html(char.goals) }
-      def self.get_fields_for_editing(char, viewer)
-        return { gift: Website.format_input_for_html(char.gift) }
+        return { gift: Website.format_markdown_for_html(char.gift), psyche: Website.format_markdown_for_html(char.psyche) }
       end
 
       def self.get_fields_for_editing(char, viewer)
-        return { psyche: Website.format_input_for_html(char.psyche) }
+        return { gift: Website.format_input_for_html(char.gift), psyche: Website.format_input_for_html(char.psyche) }
       end
 
+      def self.save_fields_from_profile_edit(char, char_data)
+        char.update(gift: char_data[:custom][:gift], psyche: char_data[:custom][:psyche])
+      end
+      
       # Return a hash of custom fields formatted for editing in chargen
       # Example: return { goals: Website.format_input_for_html(char.goals) }
       def self.get_fields_for_chargen(char)
         return {}
-      end
-      
-      # Custom fields will be in char_data[:custom]
-      # Example: char.update(goals: char_data[:custom][:goals])
-      def self.save_fields_from_profile_edit(char, char_data)
-        char.update(gift: char_data[:custom][:gift])
-      end
-
-      def self.save_fields_from_profile_edit(char, char_data)
-        char.update(psyche: char_data[:custom][:psyche])
       end
       
       # Save fields and return an array of any error messages.
