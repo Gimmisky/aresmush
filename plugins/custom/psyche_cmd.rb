@@ -1,6 +1,6 @@
 module AresMUSH
   module Custom
-    class MotivationsCmd
+    class PsycheCmd
       include CommandHandler
       
       attr_accessor :name
@@ -11,7 +11,7 @@ module AresMUSH
       
       def handle
         ClassTargetFinder.with_a_character(self.name, client, enactor) do |model|
-          template = BorderedDisplayTemplate.new model.motivations, "#{model.name}'s Motivations"
+          template = BorderedDisplayTemplate.new model.psyche, "#{model.name}'s Psyche"
           client.emit template.render
         end
       end

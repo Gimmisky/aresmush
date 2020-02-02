@@ -1,5 +1,5 @@
 module AresMUSH
   class Character
-    attribute :motivations
+    attribute :gift
   end
 end
