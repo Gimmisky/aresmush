@@ -19,12 +19,6 @@ module AresMUSH
         else
           return GiftCmd
         end
-      end
-      return nil
-    end
-
-    def self.get_cmd_handler(client, cmd, enactor)
-      case cmd.root
       when "psyche"
         case cmd.switch
         when "set"
