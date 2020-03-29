@@ -1,0 +1,9 @@
+<%= header %>
+<%= "%xh#{title}%xn%r%r" if title -%>
+<%= "%xh#{subtitle}%xn%r" if subtitle -%>
+<% @paginator.page_items.each do |l| %>
+<%= l %>
+<% end %>
+<%= @paginator.page_footer %>
+<%= "#{subfooter}%r" if subfooter -%>
+<%= footer %>
