@@ -71,6 +71,8 @@ module AresMUSH
     def self.emit_to_channel(channel, original_msg, enactor = nil, title = nil)
       enactor = enactor || Game.master.system_character
       original_msg = "#{original_msg}".gsub(/%R/i, " ")
+      original_msg = "#{original_msg}".gsub(/[\r\n]/i, " ")
+
       channel.add_to_history "#{title} #{original_msg}", enactor
       channel.characters.each do |c|
         if (!Channels.is_muted?(c, channel))
@@ -93,7 +95,7 @@ module AresMUSH
         is_page: false
       }
       
-      Global.client_monitor.notify_web_clients(:new_chat, "#{data.to_json}") do |char|
+      Global.client_monitor.notify_web_clients(:new_chat, "#{data.to_json}", true) do |char|
         char && Channels.is_on_channel?(char, channel) && !Channels.is_muted?(char, channel)
       end
     end

@@ -65,7 +65,7 @@ module AresMUSH
           Global.logger.info "Deployed web portal: #{output}"
           message = t('webportal.portal_deployed', :output => output)
           if (from_web)
-            Global.client_monitor.notify_web_clients(:manage_activity, Website.format_markdown_for_html(message)) do |c|
+            Global.client_monitor.notify_web_clients(:manage_activity, Website.format_markdown_for_html(message), false) do |c|
                c && c == enactor
             end
           elsif (enactor) # Enactor should always be specified except in the backwards-compatibility example.
@@ -87,13 +87,13 @@ module AresMUSH
     def self.can_edit_wiki_file?(actor, folder)
       return false if !actor
       wiki_admin = Website.can_manage_wiki?(actor)
-      own_folder = folder.upcase == actor.name_upcase
+      own_folder = folder.downcase == FilenameSanitizer.sanitize(actor.name)
       wiki_admin || own_folder
     end
     
     def self.folder_size_kb(folder)
       files = Dir["#{folder}/*"].select { |f| File.file?(f) }
-      files.sum { |f| File.size(f) } / 1000
+      files.sum { |f| File.size(f) } / 1024
     end
     
     def self.webportal_version
@@ -105,7 +105,7 @@ module AresMUSH
     
     def self.wiki_templates
       templates = WikiPage.all.select { |p| p.category == "template" }.map { |p| {
-        title: p.title,
+        title: p.title.gsub("template:", ""),
         text: p.text
       }
       }
