@@ -4,7 +4,7 @@ module AresMUSH
       return if !AresCentral.is_registered?
       return if !char.handle
       
-       AresMUSH.with_error_handling(nil, "Syncing handle with AresCentral.") do
+      AresMUSH.with_error_handling(nil, "Syncing handle with AresCentral.") do
         connector = AresCentral::AresConnector.new
       
         Global.logger.info "Updating handle for #{char.handle.handle_id}"
@@ -25,6 +25,7 @@ module AresMUSH
               char.update(ascii_mode_enabled: response.data["ascii_only"])
               char.update(screen_reader: response.data["screen_reader"])
               char.handle.update(friends: response.data["friends"])
+              char.handle.update(profile: response.data["profile"])
               return nil
             else
               char.handle.delete
@@ -56,8 +57,8 @@ module AresMUSH
       
         if (response.is_success?)
           handle = Handle.create(name: response.data["handle_name"], 
-              handle_id: response.data["handle_id"],
-              character: char)
+          handle_id: response.data["handle_id"],
+          character: char)
           char.update(handle: handle)
           
           Achievements.award_achievement(char, 'handle_linked')
@@ -67,5 +68,25 @@ module AresMUSH
         end  
       end
     end
+    
+    def self.unlink_handle(char)
+      return if !AresCentral.is_registered?
+      return if !char.handle
+      
+      AresMUSH.with_error_handling(nil, "Unlinking handle with AresCentral.") do
+        connector = AresCentral::AresConnector.new
+      
+        Global.logger.info "Removing handle link for #{char.handle.handle_id}"
+        
+        response = connector.unlink_handle(char.handle.handle_id, char.name, char.id)
+          
+        if (response.is_success?)
+          char.handle.delete
+          return nil
+        else
+          return t('arescentral.unlink_failed', :error => response.error_str)
+        end
+      end
+    end  
   end
 end

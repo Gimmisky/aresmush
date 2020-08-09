@@ -74,13 +74,13 @@ module AresMUSH
           end
         when "addchar", "removechar"
           return SceneCharCmd
-        when "addpose"
-          return SceneAddPoseCmd
+        when "emit"
+          return SceneEmitCmd
         when "home"
           return SceneHomeCmd
         when "join"
           return SceneJoinCmd
-        when "location", "privacy", "summary", "title", "type", "icdate", "plot", "limit"
+        when "location", "privacy", "summary", "title", "type", "icdate", "plot", "limit", "notes", "note"
           return SceneInfoCmd
         when "delete"
           return SceneDeleteCmd
