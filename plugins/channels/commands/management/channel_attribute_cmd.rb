@@ -33,18 +33,18 @@ module AresMUSH
           end
           
           channel.update(name: self.attribute)
-          client.emit_success "%xn#{t('channels.channel_renamed', :old_name => self.name, :new_name => channel.display_name)}"
+          client.emit_success "%xn#{t('channels.channel_renamed', :old_name => self.name, :new_name => Channels.display_name(nil, channel))}"
         end
       end
     end
     
-    class ChannelColorCmd
+    class ChannelDefaultColorCmd
       include ChannelAttributeCmd
     
       def handle
         Channels.with_a_channel(name, client) do |channel|
           channel.update(color: self.attribute)
-          client.emit_success "%xn#{t('channels.color_set', :name => channel.display_name)}"
+          client.emit_success "%xn#{t('channels.default_color_set', :name => Channels.display_name(nil, channel))}"
         end
       end
     end
@@ -81,9 +81,9 @@ module AresMUSH
         Channels.with_a_channel(name, client) do |channel|
         
           if (cmd.switch_is?("joinroles"))
-            channel.set_join_roles(roles)
+            channel.set_roles(roles, :join)
           else
-            channel.set_talk_roles((roles))
+            channel.set_roles(roles, :talk)
           end
         
           Channels.emit_to_channel channel, t('channels.roles_changed_by', :name => enactor_name)

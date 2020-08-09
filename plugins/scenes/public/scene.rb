@@ -86,7 +86,7 @@ module AresMUSH
     end
     
     def all_info_set?
-      missing_fields = self.title.blank? || self.location.blank? || self.scene_type.blank? || self.summary.blank?
+      missing_fields = self.title.blank? || self.location.blank? || self.scene_type.blank? || self.summary.blank? || self.icdate.blank?
       !missing_fields
     end
 
@@ -147,7 +147,7 @@ module AresMUSH
       "#{Game.web_portal_url}/scene/#{self.id}"
     end
     
-    def limited_participation?
+    def has_notes?
       !self.limit.blank?
     end
     
@@ -158,6 +158,19 @@ module AresMUSH
     
     def days_since_last_activity
       (Time.now - self.last_activity)/86400
+    end    
+    
+    def last_pose_time_str(viewer)
+      last_pose = self.poses_in_order.to_a[-1]
+      return nil if !last_pose
+      
+      elapsed = Time.now - last_pose.updated_at
+      if (elapsed < 86400 * 30)
+        TimeFormatter.format(elapsed)
+      else
+        OOCTime.local_short_timestr(viewer, last_pose.updated_at)
+      end
     end
+    
   end
 end
