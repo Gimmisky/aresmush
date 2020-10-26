@@ -144,6 +144,8 @@ module AresMUSH
         return LoginInfoRequestHandler
       when "register"
         return RegisterRequestHandler
+      when "updateAccountInfo"
+        return UpdateAccountInfoRequestHandler
       when "changePassword"
         return ChangePasswordRequestHandler
       when "accountInfo"
@@ -152,6 +154,8 @@ module AresMUSH
         return LoginNoticesRequestHandler
       when "markNotificationsRead"
         return LoginNoticesMarkReadRequestHandler
+      when "markNotificationRead"
+        return LoginNoticeMarkReadRequestHandler
       end
       nil
     end

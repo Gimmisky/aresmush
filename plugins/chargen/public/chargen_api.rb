@@ -13,6 +13,9 @@ module AresMUSH
     end
     
     def self.check_chargen_locked(target)
+      # Note: Most of these commands work on enactor-only, so we allow admins to change whatever they want
+      # on themselves. The commands that allow other players separately check whether to allow admins to override
+      # the lock.
       return nil if target.is_admin?
       return t('chargen.cant_be_changed') if target.is_approved?
       return t('chargen.app_in_progress') if target.chargen_locked
@@ -92,11 +95,14 @@ module AresMUSH
       args = { 
         name: model.name, 
         rp_hooks: model.rp_hooks || t('global.none'),
-        profile_link: "#{Game.web_portal_url}/char/#{model.name}" }
+        profile_link: "#{Game.web_portal_url}/char/#{model.name}",
+        position: '',
+        faction: '' }
       
       Demographics.all_groups.keys.each do |k|
         args[k.downcase.to_sym] = model.group(k)
       end
+      
       args
     end
   end
