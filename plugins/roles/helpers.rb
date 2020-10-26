@@ -9,7 +9,7 @@ module AresMUSH
     end
     
     def self.can_assign_role?(actor)
-      actor.is_admin?
+      actor && actor.is_admin?
     end
     
     def self.is_restricted?(name)
@@ -35,6 +35,34 @@ module AresMUSH
         admins[r] = chars
       end
       admins
+    end
+    
+    def self.all_permissions
+      permissions = []
+      Global.config_reader.config.keys.each do |section|
+        config = Global.read_config(section)
+        if (config['permissions'])
+          config['permissions'].each do |k, v|
+            permissions << {
+              section: section,
+              name: k,
+              description: v
+            }
+          end
+        end
+      end
+      permissions
+    end
+    
+    def self.save_web_roles(char, role_names)
+      new_roles = []
+      role_names.each do |r|
+        role = Role.find_one_by_name(r)
+        if (role)
+          new_roles << role
+        end
+      end
+      char.roles.replace new_roles
     end
   end
 end

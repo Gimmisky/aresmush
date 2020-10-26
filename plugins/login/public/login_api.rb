@@ -13,8 +13,8 @@ module AresMUSH
     # For IP we check the first few numbers because they're most meaningful.  
     # For the hostname, it's reversed.
     def self.is_site_match?(char_ip, char_host, ip, hostname)
-      host_search = hostname.chars.last(20).join.to_s.downcase
-      ip_search = ip.chars.first(10).join.to_s
+      host_search = "#{hostname}".chars.last(20).join.to_s.downcase
+      ip_search = "#{ip}".chars.first(10).join.to_s
 
       ip = char_ip || ""
       host = char_host || ""
@@ -79,7 +79,7 @@ module AresMUSH
       
     def self.set_random_password(char)
       charset = [('a'..'z'), ('A'..'Z'), ('0'..'9')].map(&:to_a).flatten
-      password = (0...10).map{ charset.to_a[rand(charset.size)] }.join
+      password = (0...15).map{ charset.to_a[rand(charset.size)] }.join
       char.change_password(password)
       char.update(login_api_token: '')
       char.update(login_api_token_expiry: Time.now - 86400*5)
@@ -143,6 +143,20 @@ module AresMUSH
       bootee.update(login_api_token: nil)
       
       return nil
+    end
+    
+    def self.build_web_site_info(char, viewer)
+      matches = Character.all.select { |c| Login.is_site_match?(c.last_ip, 
+        c.last_hostname, 
+        char.last_ip, 
+        char.last_hostname) }
+      findsite = matches.map { |m| { name: m.name, ip: m.last_ip, hostname: m.last_hostname } }
+      {
+        last_online: OOCTime.local_long_timestr(viewer, char.last_on),
+        last_ip: char.last_ip,
+        last_hostname: char.last_hostname,
+        findsite: findsite
+      }
     end
   end
 end
