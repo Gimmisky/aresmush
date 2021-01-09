@@ -34,8 +34,10 @@ module AresMUSH
             end
           end
         end
-                      
-        Global.logger.debug "Plot #{plot.id} created by #{enactor.name}."
+                  
+        Website.add_to_recent_changes('plot', t('scenes.plot_created', :title => plot.title), { id: plot.id }, enactor.name)
+    
+        Global.logger.info "Plot #{plot.id} created by #{enactor.name}."
   
         { id: plot.id }
       end
