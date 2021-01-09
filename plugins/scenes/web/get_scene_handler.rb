@@ -6,7 +6,7 @@ module AresMUSH
         edit_mode = request.args[:edit_mode]
         enactor = request.enactor
 
-        error = Website.check_login(request, true)
+        error = Website.check_login(request, !edit_mode)
         return error if error
         
         if (!scene)
@@ -57,7 +57,7 @@ module AresMUSH
           scene_type: scene.scene_type ? scene.scene_type.titlecase : 'unknown',
           scene_pacing: scene.scene_pacing,
           log: log,
-          plots: scene.plots.map { |plot| { title: plot.title, id: plot.id } },
+          plots: scene.related_plots.map { |plot| { title: plot.title, id: plot.id } },
           related_scenes: scene.related_scenes.sort_by { |r| r.date_title }.map { |r| { title: r.date_title, id: r.id }},
           can_edit: enactor && Scenes.can_edit_scene?(enactor, scene),
           can_delete: Scenes.can_delete_scene?(enactor, scene),

@@ -39,7 +39,7 @@ module AresMUSH
         owner: enactor
         )
           
-        Global.logger.debug "Web scene #{scene.id} created by #{enactor.name}."
+        Global.logger.info "Web scene #{scene.id} created by #{enactor.name}."
 
         plot_ids = request.args[:plots] || []
         plots = []
@@ -49,7 +49,10 @@ module AresMUSH
             plots << plot
           end
         end
-        scene.plots.replace plots
+        
+        plots.each do |p|
+          PlotLink.create(plot: p, scene: scene)
+        end
                     
         participant_names = request.args[:participants] || []
         participants = []
