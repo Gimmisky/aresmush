@@ -1,0 +1,7 @@
+---
+en:
+  randomset:
+      readout_title: "Random Arena"
+      arena_error: "%{level} isn't a valid arena level."
+      enemy_error: "%{level} isn't a valid enemy level."
+      condition_error: "%{level} isn't a valid condition level."
