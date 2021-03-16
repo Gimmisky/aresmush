@@ -44,6 +44,27 @@ module AresMUSH
              }
            }
         }}
+
+
+        # Build Seeds list for display.
+        def get_seeds_list(list)
+          list = list.to_a.sort_by { |c| c.date }.reverse
+          list[0...10].map { |c|
+          {
+            name: c.name,
+            date: c.date,
+            desc: Website.format_markdown_for_html(c.desc)
+          }}
+        end
+
+        seeds = get_seeds_list(char.seeds)
+        if (enactor == nil)
+          show_seeds = false
+        else
+          show_seeds = enactor.is_admin? || char == enactor
+        end
+        # End additional Seeds code.
+
         
         can_manage = enactor && Profile.can_manage_char_profile?(enactor, char)
         
@@ -55,9 +76,17 @@ module AresMUSH
             siteinfo = Login.build_web_site_info(char, enactor)
           end
           Login.mark_notices_read(enactor, :achievement)
+
+        # Mark Seed notifications as read, upon request of character page.
+          Login.mark_notices_read(enactor, :seeds)
+        # end Seeds addition
+
         else
           siteinfo = nil
         end
+
+
+
           
         profile_data = {
           id: char.id,
@@ -72,6 +101,7 @@ module AresMUSH
           can_manage: can_manage,
           profile: profile,
           relationships: relationships,
+	  seeds: show_seeds ? seeds : nil,
           last_online: OOCTime.local_long_timestr(enactor, char.last_on),
           profile_gallery: gallery_files.map { |g| Website.get_file_info(g) },
           playerbit: char.is_playerbit?,
