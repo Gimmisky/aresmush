@@ -33,6 +33,17 @@ module AresMUSH
           end
 
           model.update(idle_state: nil)
+
+
+          arrival_message = Global.read_config("idle", "roster_arrival_msg")
+          arrival_message_args = Chargen.welcome_message_args(model)
+          post_body = arrival_message % arrival_message_args
+
+          Forum.system_post(
+            Global.read_config("idle", "arrivals_category"), 
+            t('idle.roster_apped_subject', :name => model.name), 
+            post_body)
+
           client.emit_success t('idle.removed_from_roster', :name => model.name)
         end
       end
