@@ -15,3 +15,5 @@ Syntax: `arena/random <area level>=<enemy level>/<condition level>`
 'Condition level' will take one of mild, moderate, or extreme, and select an environmental condition appropriately.
 
 Example: `arena/random 4=Alpha/moderate`
+
+Coded by Warren (@Altair).

@@ -17,3 +17,5 @@ For each component, there is a yml file in the game's configuration, under `Admi
 `randomset_conditions.yml` is where you can add new conditions.
 
 You must follow the formatting of the existing examples when adding new entries. Things will break if the formatting is not quite exact.
+
+Coded by Warren (@Altair).

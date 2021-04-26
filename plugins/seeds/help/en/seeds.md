@@ -12,3 +12,5 @@ Seeds are plot bits sent to you by staff.
 `seeds/view <seed number>` - View the full text of a specific seed.
 
 Your most recent few Seeds are also viewable on the site, under the Seeds tab in your character profile.
+
+Coded by Warren (@Altair).

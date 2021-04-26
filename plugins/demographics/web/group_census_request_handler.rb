@@ -14,6 +14,8 @@ module AresMUSH
           groups = Chargen.approved_chars.group_by { |c| "#{OOCTime.utc_offset_display(c)} (#{c.timezone})" }
         elsif (filter == 'Rank')
           groups = Chargen.approved_chars.group_by { |c| c.rank}
+        elsif (filter == 'Apparent Age')
+          groups = Chargen.approved_chars.group_by { |c| c.demographic('apparent age')}
         else
           groups = Chargen.approved_chars.group_by { |c| c.group(filter)}
         end

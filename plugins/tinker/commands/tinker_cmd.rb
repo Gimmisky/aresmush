@@ -8,14 +8,9 @@ module AresMUSH
         return nil
       end
       
-    def handle
-        char = Character.all.select { |c| c.name == cmd.args }.first
-            if (char)
-                client.emit "You found #{char.name}"
-            else
-                client.emit "Nothing found."
-    end
-end
+      def handle
+        Scene[32].delete
+      end
 
     end
   end

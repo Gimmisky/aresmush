@@ -28,5 +28,10 @@ In this instance, have the player go to the website and clear the notification f
 
 You can also send seeds to a group of people who share a category. The seed will be sent to all characters with that specific category set.
 
-`seeds/setcat <name>=<seed category name>` - Set a category on someone (e.g. `seeds/setcat Ariel=princesses`)
+`seeds/addcat <name>=<seed category name>` - Set a category on someone (e.g. `seeds/addcat Ariel=princesses`). This does not take spaces or underscores, so if you have a multiword category, hyphenate it (e.g. hellfire-club).
+`seeds/rmcat <name>=<seed category name>` - Remove a category from someone (e.g. `seeds/rmcat Ariel=princesses`)
 `seeds/sendcat <seed category name>=<seed title>/<seed text>` - Send a seed to the category.
+
+If you find yourself blanking on what categories a char has, `ex <name>/seed_cat` will show you what their categories currently are.
+
+Coded by Warren (@Altair).
