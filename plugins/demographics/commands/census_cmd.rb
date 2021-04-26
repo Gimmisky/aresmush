@@ -37,6 +37,8 @@ module AresMUSH
           template = GenderCensusTemplate.new
         elsif (self.name == "Played By")
           template = ActorsCensusTemplate.new(paginator)
+        elsif (self.name == "Apparent Age")
+          template = ApparentAgeCensusTemplate.new(paginator)
         elsif (Ranks.is_enabled? && (self.name == "Ranks" || self.name == "Rank"))
           template = RankCensusTemplate.new
         else

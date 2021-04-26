@@ -57,6 +57,6 @@ en:
         char_is_playerbit: "This character is a player bit."
         char_not_approved: "This character is not yet approved."
         
-        extra_profile_info: "Also see %xchooks <name>%xn, %xcsheet <name>%xn and %xcrelationships <name>%xn."
+        extra_profile_info: "Also see %xchooks <name>%xn and %xcrelationships <name>%xn."
         
         profile_updated: "%{name} updated."

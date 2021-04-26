@@ -81,7 +81,8 @@ module AresMUSH
       content_warning: warning,
       tags: tags)
         
-      Channels.announce_notification(t('events.event_created_notification', :title => title))
+      Channels.announce_notification(t('events.event_created_notification', :title => title, :name => enactor.name))
+      Manage.announce t('events.event_created_notification', :title => title, :name => enactor.name)
       Events.events_updated
       Achievements.award_achievement(enactor, "event_created")
       return event
