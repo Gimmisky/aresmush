@@ -16,6 +16,10 @@ module AresMUSH
       ClassTargetFinder.with_a_character(name, client, enactor) do |model|
         Idle.add_to_roster(model, contact)
         client.emit_success t('idle.roster_updated')
+        Forum.system_post(
+          Global.read_config("idle", "idle_category"), 
+          t('idle.roster_opened_subject', :name => model.name), 
+          t('idle.roster_opened_body', :name => model.name))
       end
     end
     

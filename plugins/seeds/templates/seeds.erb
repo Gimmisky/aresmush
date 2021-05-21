@@ -1,0 +1,14 @@
+<%= header %>
+%xh<%= t('seeds.seeds_title', :name => @char.name) %>%xn
+<% paginator.page_items.each do |seed| %>
+<%= divider %>
+%xh[#<%= seed.id %>] <%= seed.date %> - <%= seed.name %>%xn
+<%= divider %>
+<% if seed.desc.length < 60 %>
+<%= seed.desc %>
+<% else %>
+<%= seed.desc[0..60] %>... (read more)
+<% end %>
+<% end %>
+<%= paginator.page_footer %>
+<%= footer %>

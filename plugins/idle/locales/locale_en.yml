@@ -18,7 +18,10 @@ en:
         previously_warned: "Previously idle warned."
         idle_post_subject: "Idled-Out Characters"
         idle_post_body: "The following characters have idled out or are in danger of doing so.%{report}"
-        not_eligible_for_idle: "This command can't be used on NPCs, roster characters and chracters exempt from the idle purge."
+        roster_opened_subject: "Rostered: %{name}"
+        roster_opened_body: "%{name} has been rostered and is now available for applications."
+        roster_apped_subject: "Approved: %{name}"
+        not_eligible_for_idle: "This command can't be used on NPCs, roster characters and characters exempt from the idle purge."
         idle_preview: "%{name} last on %{last_on}.  Status: %{status}. Suggested idle action: %{idle_action}.  Last will: %{lastwill}"
         
         lastwill_set: "Last will instructions set."
@@ -44,13 +47,13 @@ en:
         roster_claim: "Use %xcroster/claim %{name}%xn to claim this character."
         roster_app: "Use %xcroster/claim %{name}=<app>%xn to apply for this character."
         roster_claimed: "You have claimed %{name}.  Their new password is: %{password}"
-        roster_post_subject: "Roster Character Claimed"
+        roster_post_subject: "Roster Character %{name} Claimed"
         roster_post_body: "%{name} has been claimed off the roster."
         roster_welcome_msg_subject: "Welcome!"
         roster_url_hint: "The roster can be viewed more easily on the web portal: %{url}."
         roster_app_title: "Roster App - %{name}"
         roster_app_submitted: "You have submitted your application for %{name}."
-        roster_app_body: "%xhApp For:%xn %{target}%%xhRFrom:%xn %{name}%R%R%{app}"
+        roster_app_body: "%xhApp For:%xn %{target}%%xh From:%xn %{name}%R%R%{app}"
         
         destroy_approved_warning: "WARNING! Destroying approved characters is not advised. See help idle sweep for details."
         
