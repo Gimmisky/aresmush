@@ -9,7 +9,7 @@ module AresMUSH
       end
       
       def handle
-        Scene[32].delete
+        Scene[163].delete
       end
 
     end
