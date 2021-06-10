@@ -32,11 +32,11 @@ module AresMUSH
       
       def format_pose(pose)
         if (pose.is_system_pose?)
-          "   #{pose.pose}"
+          "%R   #{pose.pose}%R%R"
         elsif (pose.is_ooc)
-          "<OOC> #{pose.pose}"
+          "<OOC> #{pose.pose}%R"
         else
-          pose.pose
+          "%R#{pose.pose}%R%R"
         end
       end
     
@@ -44,7 +44,7 @@ module AresMUSH
         text = ""
         if poses.any?
           poses.each do |p|
-            text << "#{format_pose(p)}%R%R"
+            text << "#{format_pose(p)}"
           end
         elsif @scene.scene_log
           text = @scene.scene_log.log
