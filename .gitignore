@@ -43,3 +43,8 @@ killares
 # Game directory
 # -----------------------------
 /game/
+
+# Tinker
+# -----------------------------
+plugins/tinker/commands/tinker_cmd.rb
+
