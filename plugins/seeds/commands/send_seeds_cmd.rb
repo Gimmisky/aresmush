@@ -34,8 +34,8 @@ module AresMUSH
         ClassTargetFinder.with_a_character(self.target_name, client, enactor) do |model|
           v = Seed.create(name: self.seed_name, date: date, desc: self.description, character: model)
           client.emit_success "Seed ##{v.id} (#{self.seed_name}) sent to #{model.name}."
-          Login.emit_if_logged_in(model, "%xg%% You received a seed: #{self.seed_name}!%xn%R#{divider}%R#{self.description}%R#{divider}")
-          Login.notify(model, :seeds, "New seed ##{v.id}: #{self.seed_name}!", v.id)
+          Login.emit_if_logged_in(model, "%xg%% You received a seed: #{self.seed_name}.%xn%R#{divider}%R#{self.description}%R#{divider}")
+          Login.notify(model, :seeds, "New seed ##{v.id}: #{self.seed_name}.", v.id)
         end
       end
 
