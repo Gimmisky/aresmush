@@ -35,7 +35,7 @@ module AresMUSH
             attr.update(desc: self.description)
             client.emit_success "Seed #{attr.id}, #{attr.name}, was updated."
             Login.emit_if_logged_in(model, "%xg%% Seed ##{attr.id} (#{attr.name}) was updated.%xn")
-            Login.notify(model, :seeds, "Updated Seed ##{attr.id} (#{attr.name}). Check your seeds.", attr.id)
+            Login.notify(model, :seeds, "Seed ##{attr.id} (#{attr.name}) was updated. Check your seeds.", attr.id)
           else
             client.emit_failure "Seed ##{self.seed_id} not found."
           end
