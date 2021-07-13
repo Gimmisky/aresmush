@@ -77,9 +77,9 @@ module AresMUSH
        if (!model.on_roster?)
          return { error: t('idle.not_on_roster', :name => model.name) }
        end
-       if (model.roster_job && model.roster_job.is_open?)
-         return { error: t('idle.pending_roster_app') }
-       end
+       #if (model.roster_job && model.roster_job.is_open?)
+       #  return { error: t('idle.pending_roster_app') }
+       #end
        
        if (Idle.roster_app_required?(model))
          if (app_text.blank?)
@@ -122,7 +122,7 @@ module AresMUSH
          post_body = arrival_message % arrival_message_args
       
          Forum.post(forum_category, 
-         t('idle.roster_post_subject'), 
+         t('idle.roster_apped_subject', :name => model.name), 
          post_body, 
          Game.master.system_character)
        end
