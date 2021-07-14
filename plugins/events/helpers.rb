@@ -78,9 +78,9 @@ module AresMUSH
       starts: datetime, 
       description: desc,
       character: enactor,
-      content_warning: warning,
-      tags: tags)
-        
+      content_warning: warning)
+      
+      Website.update_tags(event, tags)  
       Channels.announce_notification(t('events.event_created_notification', :title => title, :name => enactor.name))
       Manage.announce t('events.event_created_notification', :title => title, :name => enactor.name)
       Events.events_updated
@@ -105,8 +105,8 @@ module AresMUSH
       event.update(starts: datetime)
       event.update(description: desc)
       event.update(content_warning: warning)
-      event.update(tags: tags)
-     
+
+      Website.update_tags(event, tags)     
       Events.events_updated
       message = t('events.event_updated_notification', :title => title)
       event.signups.each do |s|
